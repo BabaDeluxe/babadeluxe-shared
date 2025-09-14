@@ -1,0 +1,50 @@
+{
+  "name": "@babadeluxe/shared",
+  "version": "0.1.1",
+  "private": true,
+  "author": "simwai",
+  "keywords": [
+    "ts"
+  ],
+  "description": "Shared code of babadeluxe including types and constants.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "./constants/*": {
+      "types": "./dist/constants/*.d.ts",
+      "import": "./dist/constants/*.js"
+    },
+    "./types/*": {
+      "types": "./dist/types/*.d.ts",
+      "import": "./dist/types/*.js"
+    },
+    "./validators/*": {
+      "types": "./dist/validators/*.d.ts",
+      "import": "./dist/validators/*.js"
+    }
+  },
+  "scripts": {
+    "prebuild": "rimraf -g ./dist/** && barrelsby --config ./.barrelsby.json",
+    "build": "npm run prebuild && npm run build-only",
+    "build-only": "npx etsc && tsc --emitDeclarationOnly",
+    "publish-patch": "npm version patch && npm publish",
+    "publish-minor": "npm version minor && npm publish",
+    "publish-major": "npm version major && npm publish"
+  },
+  "dependencies": {
+    "yup": "^1.7.0"
+  },
+  "devDependencies": {
+    "@babadeluxe/xo-config": "^0.1.2",
+    "@sindresorhus/tsconfig": "^8.0.1",
+    "barrelsby": "^2.8.1",
+    "concurrently": "^9.2.1",
+    "esbuild-node-tsc": "^2.0.5",
+    "rimraf": "^6.0.1",
+    "socket.io": "^4.8.1",
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.2",
+    "xo": "^1.2.2"
+  }
+}
