@@ -1,7 +1,6 @@
 {
   "name": "@babadeluxe/shared",
   "version": "0.1.2",
-  "private": true,
   "author": "simwai",
   "keywords": [
     "ts"
@@ -25,9 +24,10 @@
     }
   },
   "scripts": {
-    "prebuild": "rimraf -g ./dist/** && barrelsby --config ./.barrelsby.json",
-    "build": "npm run prebuild && npm run build-only",
-    "build-only": "npx etsc && tsc --emitDeclarationOnly",
+    "format": "xo --fix --prettier",
+    "prebuild": "npx rimraf -g ./dist/** && barrelsby --config ./.barrelsby.json",
+    "build": "npx rimraf -g ./dist/** && npm run prebuild && npm run build-only",
+    "build-only": "npx rimraf -g ./dist/** && tsc",
     "publish-patch": "npm version patch && npm publish",
     "publish-minor": "npm version minor && npm publish",
     "publish-major": "npm version major && npm publish"
@@ -36,11 +36,11 @@
     "yup": "^1.7.0"
   },
   "devDependencies": {
-    "@babadeluxe/xo-config": "^0.1.2",
+    "@babadeluxe/xo-config": "^0.1.14",
     "@sindresorhus/tsconfig": "^8.0.1",
     "barrelsby": "^2.8.1",
     "concurrently": "^9.2.1",
-    "esbuild-node-tsc": "^2.0.5",
+    "husky": "^9.1.7",
     "rimraf": "^6.0.1",
     "socket.io": "^4.8.1",
     "tsx": "^4.20.5",
