@@ -1,0 +1,21 @@
+{
+    "directory": [
+        "./src"
+    ],
+    "exclude": [
+        "\\.spec\\.ts$",
+        "\\.test\\.ts$",
+        "\\.d\\.ts$",
+        "(.*)node_modules(.*)"
+    ],
+    "delete": true,
+    "mode": "all",
+    "name": "index",
+    "verbose": true,
+    "singleQuotes": true,
+    "noSemicolon": true,
+    "location": "all",
+    "local": false,
+    "exportStar": true,
+    "includeDocumentationComments": false
+}

@@ -1,0 +1,54 @@
+// Place your settings in this file to overwrite default and user settings.
+{
+    // Turn off tsc task auto detection since we have the necessary tasks as npm scripts
+    "typescript.tsc.autoDetect": "off",
+    "editor.formatOnSave": true,
+    "editor.formatOnType": false, // required
+    "xo.enable": true,
+    "xo.format.enable": true,
+    "eslint.enable": false,
+    "eslint.format.enable": false,
+    "editor.codeActionsOnSave": {
+        "source.fixAll": "always", // or you can use the xo specific code action on save
+        "source.fixAll.xo": "always"
+    },
+    "files.exclude": {
+        "**/out/**": false, // set this to true to hide the "out" folder with the compiled JS files
+        "**/dist/**": false // set this to true to hide the "dist" folder with the compiled JS files
+    },
+    "search.exclude": {
+        "**/out/**": true, // set this to false to include "out" folder in search results
+        "**/dist/**": true // set this to false to include "dist" folder in search results
+    },
+    "editor.formatOnSaveMode": "file", // required to format on save
+    "typescript.suggest.paths": true,
+    "javascript.suggest.paths": true,
+    "files.eol": "\n",
+    "search.quickOpen.includeHistory": false,
+    "typescript.tsserver.experimental.enableProjectDiagnostics": true,
+    "[vue]": {
+        "editor.defaultFormatter": "Vue.volar"
+    },
+    "[javascript]": {
+        "editor.defaultFormatter": "samverschueren.linter-xo"
+    },
+    "[typescript]": {
+        "editor.defaultFormatter": "samverschueren.linter-xo"
+    },
+    "[javascriptreact]": {
+        "editor.defaultFormatter": "samverschueren.linter-xo"
+    },
+    "[typescriptreact]": {
+        "editor.defaultFormatter": "samverschueren.linter-xo"
+    },
+    "[json]": {
+        "editor.defaultFormatter": "vscode.json-language-features"
+    },
+    "[jsonc]": {
+        "editor.quickSuggestions": {
+            "strings": true
+        },
+        "editor.suggest.insertMode": "replace",
+        "editor.defaultFormatter": "vscode.json-language-features"
+    }
+}
