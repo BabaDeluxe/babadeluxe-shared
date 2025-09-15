@@ -1,0 +1,16 @@
+export enum PromptEvents {
+  GET_ALL = 'prompts:get_all',
+  GET_BY_ID = 'prompts:get_by_id',
+  CREATE_PROMPT = 'prompts:create',
+  UPDATE_PROMPT = 'prompts:update',
+  DELETE_PROMPT = 'prompts:delete',
+  EXECUTE_PROMPT = 'prompts:execute',
+  GET_CATEGORIES = 'prompts:get_categories',
+  PROMPTS_LIST = 'prompts:list',
+  PROMPT_CREATED = 'prompts:created',
+  PROMPT_UPDATED = 'prompts:updated',
+  PROMPT_DELETED = 'prompts:deleted',
+  PROMPT_EXECUTED = 'prompts:executed',
+  CATEGORIES_LIST = 'prompts:categories',
+  PROMPTS_ERROR = 'prompts:error',
+}
