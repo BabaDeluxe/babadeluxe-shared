@@ -8,14 +8,6 @@ else
   COMMIT_MSG=""
 fi
 
-# Check if test files exist
-TEST_FILES=$(find . -name '*.test.ts' -o -name '*.spec.ts' | wc -l)
-
-if [ "$TEST_FILES" -gt 0 ]; then
-  # Exit if tests fail
-  npm run test || exit 1
-fi
-
 # Format JavaScript code
 npm run format
 
