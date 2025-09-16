@@ -26,6 +26,7 @@
     "prebuild": "npx rimraf -g ./dist/** && barrelsby --config ./.barrelsby.json",
     "build": "npm run prebuild && npm run build-only",
     "build-only": "tsc",
+    "test-package": "npm pack --dry-run",
     "publish-patch": "npm version patch && npm publish",
     "publish-minor": "npm version minor && npm publish",
     "publish-major": "npm version major && npm publish",
