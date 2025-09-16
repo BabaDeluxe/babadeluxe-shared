@@ -11,7 +11,7 @@
     "delete": true,
     "mode": "all",
     "name": "index",
-    "verbose": true,
+    "verbose": false,
     "singleQuotes": true,
     "noSemicolon": true,
     "location": "all",

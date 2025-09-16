@@ -7,8 +7,6 @@
   ],
   "description": "Shared code of babadeluxe including types and constants.",
   "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
   "exports": {
     "./constants/*": {
       "types": "./dist/constants/*.d.ts",
@@ -26,8 +24,8 @@
   "scripts": {
     "format": "xo --fix --prettier",
     "prebuild": "npx rimraf -g ./dist/** && barrelsby --config ./.barrelsby.json",
-    "build": "npx rimraf -g ./dist/** && npm run prebuild && npm run build-only",
-    "build-only": "npx rimraf -g ./dist/** && tsc",
+    "build": "npm run prebuild && npm run build-only",
+    "build-only": "tsc",
     "publish-patch": "npm version patch && npm publish",
     "publish-minor": "npm version minor && npm publish",
     "publish-major": "npm version major && npm publish",
@@ -37,7 +35,7 @@
     "yup": "^1.7.0"
   },
   "devDependencies": {
-    "@babadeluxe/xo-config": "^0.1.14",
+    "@babadeluxe/xo-config": "^0.1.15",
     "@sindresorhus/tsconfig": "^8.0.1",
     "barrelsby": "^2.8.1",
     "concurrently": "^9.2.1",

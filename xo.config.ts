@@ -1,15 +1,15 @@
-import { type FlatXoConfig, type XoConfigItem } from 'xo'
+import { type FlatXoConfig } from 'xo'
 import sharedConfig from '@babadeluxe/xo-config'
 
-const baseConfig = sharedConfig as XoConfigItem | XoConfigItem[]
+const baseConfig = sharedConfig
 const configArray = Array.isArray(baseConfig) ? baseConfig : [baseConfig]
 
 const config: FlatXoConfig = configArray.map((item) => ({
   ...item,
   rules: {
     ...item.rules,
-    'import-x/extensions': 'off',
-    '@typescript-eslint/consistent-type-exports': 'off',
+    'import-x/extensions': 'off', // eslint-disable-line @typescript-eslint/naming-convention
+    '@typescript-eslint/consistent-type-exports': 'off', // eslint-disable-line @typescript-eslint/naming-convention
   },
 }))
 
