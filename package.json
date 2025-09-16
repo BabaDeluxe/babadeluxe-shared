@@ -46,16 +46,16 @@
     "build": "npm run prebuild && npm run build-only",
     "build-only": "tsc",
     "test-package": "npm pack --dry-run",
-    "publish-patch": "npm version patch && npm publish",
-    "publish-minor": "npm version minor && npm publish",
-    "publish-major": "npm version major && npm publish",
+    "publish-patch": "npm run build && npm version patch && npm publish",
+    "publish-minor": "npm run build && npm version minor && npm publish",
+    "publish-major": "npm run build && npm version major && npm publish",
     "prepare": "husky"
   },
   "dependencies": {
     "yup": "^1.7.0"
   },
   "devDependencies": {
-    "@babadeluxe/xo-config": "^0.1.15",
+    "@babadeluxe/xo-config": "^0.1.20",
     "@sindresorhus/tsconfig": "^8.0.1",
     "barrelsby": "^2.8.1",
     "concurrently": "^9.2.1",

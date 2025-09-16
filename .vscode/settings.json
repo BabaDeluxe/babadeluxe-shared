@@ -23,12 +23,11 @@
     "editor.formatOnSaveMode": "file", // required to format on save
     "typescript.suggest.paths": true,
     "javascript.suggest.paths": true,
+    "terminal.integrated.detectLocale": "on",
+    "files.encoding": "utf8",
     "files.eol": "\n",
-    "search.quickOpen.includeHistory": false,
+    "search.quickOpen.includeHistory": true,
     "typescript.tsserver.experimental.enableProjectDiagnostics": true,
-    "[vue]": {
-        "editor.defaultFormatter": "Vue.volar"
-    },
     "[javascript]": {
         "editor.defaultFormatter": "samverschueren.linter-xo"
     },
