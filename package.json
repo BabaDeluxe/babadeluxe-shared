@@ -6,8 +6,14 @@
     "ts"
   ],
   "description": "Shared code of babadeluxe including types and constants.",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "type": "module",
   "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
     "./constants/*": {
       "types": "./dist/constants/*.d.ts",
       "import": "./dist/constants/*.js"
@@ -19,6 +25,19 @@
     "./validators/*": {
       "types": "./dist/validators/*.d.ts",
       "import": "./dist/validators/*.js"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "constants/*": [
+        "./dist/constants/*.d.ts"
+      ],
+      "types/*": [
+        "./dist/types/*.d.ts"
+      ],
+      "validators/*": [
+        "./dist/validators/*.d.ts"
+      ]
     }
   },
   "scripts": {
