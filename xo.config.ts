@@ -8,8 +8,8 @@ const config: FlatXoConfig = configArray.map((item) => ({
   ...item,
   rules: {
     ...item.rules,
-    'import-x/extensions': 'off', // eslint-disable-line @typescript-eslint/naming-convention
-    '@typescript-eslint/consistent-type-exports': 'off', // eslint-disable-line @typescript-eslint/naming-convention
+    'import-x/extensions': 'off',
+    '@typescript-eslint/consistent-type-exports': 'off',
   },
 }))
 

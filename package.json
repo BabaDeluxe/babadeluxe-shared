@@ -55,7 +55,7 @@
     "yup": "^1.7.0"
   },
   "devDependencies": {
-    "@babadeluxe/xo-config": "^0.1.20",
+    "@babadeluxe/xo-config": "^0.1.26",
     "@sindresorhus/tsconfig": "^8.0.1",
     "barrelsby": "^2.8.1",
     "concurrently": "^9.2.1",
