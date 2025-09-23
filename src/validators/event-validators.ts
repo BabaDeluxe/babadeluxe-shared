@@ -9,6 +9,7 @@ export enum LlmEvents {
   STREAM_START = 'llm:stream-start',
   STREAM_END = 'llm:stream-end',
   STREAM_CANCELLED = 'llm:stream-cancelled',
+  STREAM_ERROR = 'llm:stream-error',
   QUOTA_EXCEEDED = 'llm:quota-exceeded',
 }
 

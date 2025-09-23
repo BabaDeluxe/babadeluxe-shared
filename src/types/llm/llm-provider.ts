@@ -1,4 +1,4 @@
-import type { StreamChunkData } from '../validators/event-validators.js'
+import type { StreamChunkData } from '../../validators/event-validators.js'
 import type { CompletionParameters } from './completion-parameters.js'
 
 export type ExtendedCompletionParameters = CompletionParameters & {

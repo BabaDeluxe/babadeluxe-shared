@@ -1,6 +1,6 @@
 export type CompletionParameters = {
   model: string
-  messages: Array<{ role: string; content: string }> // Generic interface type
+  message: string
   temperature?: number
   maxTokens?: number
 }

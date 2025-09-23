@@ -1,3 +1,3 @@
 export type SocketData = {
-  readonly userId: string
+  userId: string
 }

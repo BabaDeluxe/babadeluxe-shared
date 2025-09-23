@@ -21,16 +21,3 @@ export enum Messages {
   CONVERSATION_TITLE_PLACEHOLDER = 'Enter conversation title...',
   SEARCH_PLACEHOLDER = 'Search conversations...',
 }
-
-export const enum Timing {
-  ASSISTANT_RESPONSE_DELAY = 1000,
-  VALIDATION_DEBOUNCE = 300,
-  NOTIFICATION_DURATION = 5000,
-}
-
-export const enum Limits {
-  MAX_TITLE_LENGTH = 128,
-  MAX_MESSAGE_LENGTH = 4096,
-  VIRTUAL_SCROLL_ITEM_SIZE = 80,
-  MESSAGES_THRESHOLD = 100,
-}
