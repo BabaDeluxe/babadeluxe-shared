@@ -79,15 +79,29 @@ export type QuotaExceededData = InferType<typeof quotaExceededSchema>
 
 type Ack<T = unknown> = (response: CallbackResponse<T>) => void
 
+// TODO: Check if I can use the socket types here
+export type StartStreamAck = { success: true } | { success: false; error: string }
+export type CancelStreamAck = { success: true } | { success: false; error: string }
+export type GetModelsAck =
+  | { success: true; data: Array<{ id: string; name: string; provider: string }> }
+  | { success: false; error: string }
+
 export type ClientToServerEvents = {
-  readonly [LlmEvents.START_STREAM]: (data: StartStreamData, callback: Ack) => void
-  readonly [LlmEvents.CANCEL_STREAM]: (data: CancelStreamData, callback: Ack) => void
-  readonly [LlmEvents.GET_MODELS]: (callback: Ack<readonly string[]>) => void
+  [LlmEvents.START_STREAM]: (data: StartStreamData, ack: Ack<StartStreamAck>) => void
+  [LlmEvents.CANCEL_STREAM]: (data: CancelStreamData, ack: Ack<CancelStreamAck>) => void
+  [LlmEvents.GET_MODELS]: (ack: Ack<GetModelsAck>) => void
 }
 
 export type ServerToClientEvents = {
-  readonly [LlmEvents.QUOTA_EXCEEDED]: (data: QuotaExceededData) => void
-  readonly [LlmEvents.STREAM_CHUNK]: (data: StreamChunkData) => void
-  readonly [LlmEvents.STREAM_END]: (data: StreamEndData) => void
-  readonly [LlmEvents.STREAM_CANCELLED]: (data: StreamCancelledData) => void
+  [LlmEvents.STREAM_START]: (payload: { streamId: string }) => void
+  [LlmEvents.STREAM_CHUNK]: (payload: { streamId: string; chunk: string; index: number }) => void
+  [LlmEvents.STREAM_END]: (payload: {
+    streamId: string
+    fullResponse?: string
+    model: string
+    temperature: number
+  }) => void
+  [LlmEvents.STREAM_CANCELLED]: (payload: { streamId: string; reason: string }) => void
+  [LlmEvents.STREAM_ERROR]: (payload: { streamId: string; error?: string }) => void
+  [LlmEvents.QUOTA_EXCEEDED]: (payload: { streamId: string; limit: number }) => void
 }
