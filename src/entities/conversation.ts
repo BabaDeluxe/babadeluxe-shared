@@ -4,5 +4,5 @@ export type Conversation = {
   createdAt: Date
   updatedAt?: Date
   messageCount: number
-  isActive: boolean
+  isActive: number
 }
