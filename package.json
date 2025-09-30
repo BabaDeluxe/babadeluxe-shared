@@ -46,9 +46,9 @@
     "build": "npm run prebuild && npm run build-only",
     "build-only": "tsc",
     "test-package": "npm pack --dry-run",
-    "publish-patch": "npm run build && npm version patch && npm publish",
-    "publish-minor": "npm run build && npm version minor && npm publish",
-    "publish-major": "npm run build && npm version major && npm publish",
+    "publish-patch": "npm version patch && npm publish",
+    "publish-minor": "npm version minor && npm publish",
+    "publish-major": "npm version major && npm publish",
     "prepare": "husky"
   },
   "dependencies": {
