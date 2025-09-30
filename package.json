@@ -7,44 +7,25 @@
   ],
   "description": "Shared code of babadeluxe including types and constants.",
   "type": "module",
-  "main": "./dist/index.js",
+  "main": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    },
-    "./constants/*": {
-      "types": "./dist/constants/*.d.ts",
-      "import": "./dist/constants/*.js"
-    },
-    "./types/*": {
-      "types": "./dist/types/*.d.ts",
-      "import": "./dist/types/*.js"
-    },
-    "./validators/*": {
-      "types": "./dist/validators/*.d.ts",
-      "import": "./dist/validators/*.js"
+      "import": "./dist/index.mjs"
     }
   },
   "typesVersions": {
     "*": {
-      "constants/*": [
-        "./dist/constants/*.d.ts"
-      ],
-      "types/*": [
-        "./dist/types/*.d.ts"
-      ],
-      "validators/*": [
-        "./dist/validators/*.d.ts"
+      "*": [
+        "./dist/*.d.ts"
       ]
     }
   },
   "scripts": {
     "format": "xo --fix --prettier",
     "prebuild": "npx rimraf -g ./dist/** && barrelsby --config ./.barrelsby.json",
-    "build": "npm run prebuild && npm run build-only",
-    "build-only": "tsc",
+    "build": "npm run prebuild && unbuild",
     "test-package": "npm pack --dry-run",
     "publish-patch": "npm version patch && npm publish",
     "publish-minor": "npm version minor && npm publish",
@@ -64,6 +45,7 @@
     "socket.io": "^4.8.1",
     "tsx": "^4.20.5",
     "typescript": "^5.9.2",
+    "unbuild": "^3.6.1",
     "xo": "^1.2.2"
   }
 }
