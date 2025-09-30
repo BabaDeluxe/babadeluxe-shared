@@ -4,4 +4,3 @@
 
 export * from './prompt-events'
 export * from './setting-events-enum'
-export * from './webview-enum'

@@ -15,14 +15,25 @@
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
     },
-    "./entities": "./dist/entities/index.mjs",
-    "./events": "./dist/events/index.mjs",
-    "./socket": "./dist/socket/index.mjs",
-    "./validators": "./dist/validators/index.mjs",
-    "./events/*": {
-      "types": "./dist/events/*/index.d.ts",
-      "import": "./dist/events/*/index.mjs",
-      "require": "./dist/events/*/index.cjs"
+    "./entities": {
+      "types": "./dist/entities/index.d.ts",
+      "import": "./dist/entities/index.mjs",
+      "require": "./dist/entities/index.cjs"
+    },
+    "./events": {
+      "types": "./dist/events/index.d.ts",
+      "import": "./dist/events/index.mjs",
+      "require": "./dist/events/index.cjs"
+    },
+    "./socket": {
+      "types": "./dist/socket/index.d.ts",
+      "import": "./dist/socket/index.mjs",
+      "require": "./dist/socket/index.cjs"
+    },
+    "./validators": {
+      "types": "./dist/validators/index.d.ts",
+      "import": "./dist/validators/index.mjs",
+      "require": "./dist/validators/index.cjs"
     }
   },
   "scripts": {

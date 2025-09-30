@@ -8,6 +8,8 @@ else
   COMMIT_MSG=""
 fi
 
+npm run prebuild
+
 # Format JavaScript code
 npm run format
 
