@@ -12,20 +12,23 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs"
-    }
-  },
-  "typesVersions": {
-    "*": {
-      "*": [
-        "./dist/*.d.ts"
-      ]
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    },
+    "./entities": "./dist/entities/index.mjs",
+    "./events": "./dist/events/index.mjs",
+    "./socket": "./dist/socket/index.mjs",
+    "./validators": "./dist/validators/index.mjs",
+    "./events/*": {
+      "types": "./dist/events/*/index.d.ts",
+      "import": "./dist/events/*/index.mjs",
+      "require": "./dist/events/*/index.cjs"
     }
   },
   "scripts": {
     "format": "xo --fix --prettier",
     "prebuild": "npx rimraf -g ./dist/** && barrelsby --config ./.barrelsby.json",
-    "build": "npm run prebuild && unbuild",
+    "build": "npm run-script prebuild && unbuild",
     "test-package": "npm pack --dry-run",
     "publish-patch": "npm version patch && npm publish",
     "publish-minor": "npm version minor && npm publish",
