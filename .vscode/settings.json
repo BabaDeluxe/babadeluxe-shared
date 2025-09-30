@@ -1,13 +1,15 @@
 // Place your settings in this file to overwrite default and user settings.
 {
-    // Turn off tsc task auto detection since we have the necessary tasks as npm scripts
-    "typescript.tsc.autoDetect": "off",
     "editor.formatOnSave": true,
     "editor.formatOnType": false, // required
     "xo.enable": true,
     "xo.format.enable": true,
     "eslint.enable": false,
     "eslint.format.enable": false,
+    "conventionalCommits.silentAutoCommit": false,
+    "conventionalCommits.autoCommit": false,
+    "git.enableSmartCommit": false,
+    "git.suggestSmartCommit": false,
     "editor.codeActionsOnSave": {
         "source.fixAll": "always", // or you can use the xo specific code action on save
         "source.fixAll.xo": "always"
