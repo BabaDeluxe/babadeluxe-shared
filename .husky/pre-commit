@@ -8,6 +8,9 @@ else
   COMMIT_MSG=""
 fi
 
+# Generate barrel files with barrelsby
+npm run prebuild
+
 # Format JavaScript code
 npm run format
 
