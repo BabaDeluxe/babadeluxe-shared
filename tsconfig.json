@@ -2,7 +2,7 @@
   "extends": "@sindresorhus/tsconfig",
   "compilerOptions": {
     "outDir": "./dist",
-    "rootDir": ".",
+    "rootDir": "./",
     "sourceRoot": "./src",
     "sourceMap": true,
     "experimentalDecorators": true,
@@ -17,6 +17,7 @@
     "moduleResolution": "bundler"
   },
   "include": [
-    "./src/**/*"
+    "./src/**/*",
+    "xo.config.ts"
   ],
 }
