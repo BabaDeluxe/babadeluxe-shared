@@ -20,11 +20,6 @@
       "import": "./dist/entities/index.mjs",
       "require": "./dist/entities/index.cjs"
     },
-    "./events": {
-      "types": "./dist/events/index.d.ts",
-      "import": "./dist/events/index.mjs",
-      "require": "./dist/events/index.cjs"
-    },
     "./settings": {
       "types": "./dist/settings/index.d.ts",
       "import": "./dist/settings/index.mjs",
