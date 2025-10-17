@@ -79,12 +79,9 @@ export type QuotaExceededData = InferType<typeof quotaExceededSchema>
 
 type Ack<T = unknown> = (response: CallbackResponse<T>) => void
 
-// TODO: Check if I can use the socket types here
 export type StartStreamAck = { success: true } | { success: false; error: string }
 export type CancelStreamAck = { success: true } | { success: false; error: string }
-export type GetModelsAck =
-  | { success: true; data: Array<{ id: string; name: string; provider: string }> }
-  | { success: false; error: string }
+export type GetModelsAck = Array<{ id: string; name: string; provider: string }>
 
 export type ClientToServerEvents = {
   [LlmEvents.START_STREAM]: (data: StartStreamData, ack: Ack<StartStreamAck>) => void
