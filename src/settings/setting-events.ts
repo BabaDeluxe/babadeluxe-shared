@@ -7,16 +7,6 @@ export enum SettingEvents {
   ERROR = 'settings:error',
 }
 
-export type UpdateSettingPayload = {
-  readonly settingKey: string
-  readonly settingValue: unknown
-  readonly dataType: string
-}
-
-export type DeleteSettingPayload = {
-  readonly settingKey: string
-}
-
 export type SettingUpdatedEvent = {
   readonly settingKey: string
   readonly settingValue: unknown

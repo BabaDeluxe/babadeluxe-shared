@@ -43,7 +43,7 @@
   },
   "scripts": {
     "format": "xo --fix --prettier",
-    "prebuild": "npx rimraf -g ./dist/** && barrelsby --config ./.barrelsby.json",
+    "prebuild": "npx rimraf -g ./dist/** && npx rimraf -g ./src/**/index.ts && barrelsby --config ./.barrelsby.json",
     "build": "npm run-script prebuild && unbuild",
     "test-package": "npm pack --dry-run",
     "publish-patch": "npm version patch && npm publish",
@@ -55,7 +55,7 @@
     "yup": "^1.7.0"
   },
   "devDependencies": {
-    "@babadeluxe/xo-config": "^0.1.26",
+    "@babadeluxe/xo-config": "^0.2.1",
     "@sindresorhus/tsconfig": "^8.0.1",
     "barrelsby": "^2.8.1",
     "concurrently": "^9.2.1",

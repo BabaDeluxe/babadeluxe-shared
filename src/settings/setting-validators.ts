@@ -1,5 +1,4 @@
 import * as yup from 'yup'
-import { type InferType } from 'yup'
 import { settingDefinitions, type SettingKey, type SettingDataType } from './setting-definitions.js'
 
 export const settingDataTypeSchema = yup.string().oneOf(['string', 'number', 'boolean']).required()
@@ -17,9 +16,6 @@ export const deleteSettingPayloadSchema = yup
     settingKey: yup.string().required(),
   })
   .required()
-
-export type UpdateSettingPayload = InferType<typeof updateSettingPayloadSchema>
-export type DeleteSettingPayload = InferType<typeof deleteSettingPayloadSchema>
 
 export const validateSettingValue = (
   key: string,

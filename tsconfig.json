@@ -2,7 +2,7 @@
   "extends": "@sindresorhus/tsconfig",
   "compilerOptions": {
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDir": ".",
     "sourceRoot": "./src",
     "sourceMap": true,
     "experimentalDecorators": true,
@@ -16,11 +16,6 @@
     "module": "esnext",
     "moduleResolution": "bundler"
   },
-  "references": [
-    {
-      "path": "./tsconfig.xo.json"
-    }
-  ],
   "include": [
     "./src/**/*"
   ],
