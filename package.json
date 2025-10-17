@@ -25,6 +25,11 @@
       "import": "./dist/events/index.mjs",
       "require": "./dist/events/index.cjs"
     },
+    "./settings": {
+      "types": "./dist/settings/index.d.ts",
+      "import": "./dist/settings/index.mjs",
+      "require": "./dist/settings/index.cjs"
+    },
     "./socket": {
       "types": "./dist/socket/index.d.ts",
       "import": "./dist/socket/index.mjs",
