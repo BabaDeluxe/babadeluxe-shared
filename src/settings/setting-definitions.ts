@@ -51,7 +51,13 @@ export const settingDefinitions = {
 
 export type SettingKey = keyof typeof settingDefinitions
 export type SettingDefinition = (typeof settingDefinitions)[SettingKey]
-export type SettingDataType = 'string' | 'number' | 'boolean'
+export type SettingDataType = SettingDefinition['dataType']
+
+export type UserSettingWithValidation = {
+  readonly settingKey: string
+  readonly settingValue: unknown
+  readonly updatedAt: Date
+} & Omit<SettingDefinition, 'encrypted'>
 
 export const getSettingDefinition = (key: string): SettingDefinition | undefined => {
   return settingDefinitions[key as SettingKey]
