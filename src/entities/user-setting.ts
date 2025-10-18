@@ -1,4 +1,4 @@
-export type UserSeting = {
+export type UserSetting = {
   readonly id: number
   readonly key: string
   readonly value: string
