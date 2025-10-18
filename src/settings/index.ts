@@ -3,6 +3,5 @@
  */
 
 export * from './setting-definitions'
-export * from './setting-events'
-export * from './setting-types'
-export * from './setting-validators'
+export * from './settings-actions'
+export * from './settings-socket-config'

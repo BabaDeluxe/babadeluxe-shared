@@ -38,7 +38,7 @@
   },
   "scripts": {
     "format": "xo --fix --prettier",
-    "prebuild": "npx rimraf -g ./dist/** && npx rimraf -g ./src/**/index.ts && barrelsby --config ./.barrelsby.json",
+    "prebuild": "npx rimraf -g ./dist/** ./src/**/index.ts && barrelsby --config ./.barrelsby.json",
     "build": "npm run-script prebuild && unbuild",
     "test-package": "npm pack --dry-run",
     "publish-patch": "npm version patch && npm publish",
@@ -47,7 +47,9 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "yup": "^1.7.0"
+    "yup": "^1.7.0",
+    "zod": "^4.1.12",
+    "zod-sockets": "^5.0.0"
   },
   "devDependencies": {
     "@babadeluxe/xo-config": "^0.2.1",
