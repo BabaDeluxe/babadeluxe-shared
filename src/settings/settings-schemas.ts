@@ -21,6 +21,12 @@ export type UserSettingWithValidation = {
   readonly updatedAt: Date
   readonly category: string
   readonly encrypted: boolean
+  readonly required: boolean
+  readonly description: string
+  readonly minLength?: number
+  readonly maxLength?: number
+  readonly minValue?: number
+  readonly maxValue?: number
 }
 
 type SettingDefinition = {
