@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+// Business validation (used when CALLING APIs, not for socket transport)
 export const settingSchemas = {
   apiKeyOpenai: z.string().min(23).describe('OpenAI API key for GPT models'),
   apiKeyAnthropic: z.string().min(100).describe('Anthropic API key for Claude models'),
@@ -8,10 +9,11 @@ export const settingSchemas = {
 
 export type SettingKey = keyof typeof settingSchemas
 
+// UI metadata ONLY
 export const settingMetadata = {
-  apiKeyOpenai: { category: 'apiKey', encrypted: true },
-  apiKeyAnthropic: { category: 'apiKey', encrypted: true },
-  apiKeyGoogle: { category: 'apiKey', encrypted: true },
+  apiKeyOpenai: { category: 'apiKey', encrypted: true, required: true },
+  apiKeyAnthropic: { category: 'apiKey', encrypted: true, required: true },
+  apiKeyGoogle: { category: 'apiKey', encrypted: true, required: true },
 } as const
 
 export type UserSettingWithValidation = {
@@ -29,35 +31,20 @@ export type UserSettingWithValidation = {
   readonly maxValue?: number
 }
 
-type SettingDefinition = {
-  readonly required: boolean
-  readonly description: string
-  readonly category: string
-  readonly minLength?: number
-  readonly maxLength?: number
-  readonly minValue?: number
-  readonly maxValue?: number
-}
+// Derive UI hints from schemas + metadata
+export function getSettingDefinition(key: string) {
+  const schema = settingSchemas[key as SettingKey]
+  const metadata = settingMetadata[key as SettingKey]
 
-const definitions: Record<string, SettingDefinition> = {
-  apiKeyOpenai: {
-    required: false,
-    description: 'OpenAI API key for GPT models',
-    category: 'apiKey',
-    minLength: 23,
-  },
-  apiKeyAnthropic: {
-    required: false,
-    description: 'Anthropic API key for Claude models',
-    category: 'apiKey',
-    minLength: 100,
-  },
-  apiKeyGoogle: {
-    required: false,
-    description: 'Google Gemini API key',
-    category: 'apiKey',
-    minLength: 35,
-  },
-}
+  if (!schema || !metadata) return undefined
 
-export const getSettingDefinition = (key: string): SettingDefinition | undefined => definitions[key]
+  return {
+    required: metadata.required,
+    description: schema.description ?? '',
+    category: metadata.category,
+    minLength: schema.minLength ?? undefined,
+    maxLength: schema.maxLength ?? undefined,
+    minValue: undefined,
+    maxValue: undefined,
+  }
+}
