@@ -20,6 +20,11 @@
       "import": "./dist/entities/index.mjs",
       "require": "./dist/entities/index.cjs"
     },
+    "./generated-socket-types": {
+      "types": "./dist/generated-socket-types/index.d.ts",
+      "import": "./dist/generated-socket-types/index.mjs",
+      "require": "./dist/generated-socket-types/index.cjs"
+    },
     "./settings": {
       "types": "./dist/settings/index.d.ts",
       "import": "./dist/settings/index.mjs",
