@@ -22,3 +22,36 @@ export type UserSettingWithValidation = {
   readonly category: string
   readonly encrypted: boolean
 }
+
+type SettingDefinition = {
+  readonly required: boolean
+  readonly description: string
+  readonly category: string
+  readonly minLength?: number
+  readonly maxLength?: number
+  readonly minValue?: number
+  readonly maxValue?: number
+}
+
+const definitions: Record<string, SettingDefinition> = {
+  apiKeyOpenai: {
+    required: false,
+    description: 'OpenAI API key for GPT models',
+    category: 'apiKey',
+    minLength: 23,
+  },
+  apiKeyAnthropic: {
+    required: false,
+    description: 'Anthropic API key for Claude models',
+    category: 'apiKey',
+    minLength: 100,
+  },
+  apiKeyGoogle: {
+    required: false,
+    description: 'Google Gemini API key',
+    category: 'apiKey',
+    minLength: 35,
+  },
+}
+
+export const getSettingDefinition = (key: string): SettingDefinition | undefined => definitions[key]
