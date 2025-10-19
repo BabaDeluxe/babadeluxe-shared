@@ -1,19 +1,50 @@
 import { z } from 'zod'
 
-// Business validation (used when CALLING APIs, not for socket transport)
+const constraints = {
+  apiKeyOpenai: { minLength: 23, required: false },
+  apiKeyAnthropic: { minLength: 100, required: false },
+  apiKeyGoogle: { minLength: 35, required: false },
+} as const
+
 export const settingSchemas = {
-  apiKeyOpenai: z.string().min(23).describe('OpenAI API key for GPT models'),
-  apiKeyAnthropic: z.string().min(100).describe('Anthropic API key for Claude models'),
-  apiKeyGoogle: z.string().min(35).describe('Google Gemini API key'),
+  apiKeyOpenai: z
+    .string()
+    .min(constraints.apiKeyOpenai.minLength)
+    .describe('OpenAI API key for GPT models')
+    .optional(),
+  apiKeyAnthropic: z
+    .string()
+    .min(constraints.apiKeyAnthropic.minLength)
+    .describe('Anthropic API key for Claude models')
+    .optional(),
+  apiKeyGoogle: z
+    .string()
+    .min(constraints.apiKeyGoogle.minLength)
+    .describe('Google Gemini API key')
+    .optional(),
 } as const
 
 export type SettingKey = keyof typeof settingSchemas
 
-// UI metadata ONLY
 export const settingMetadata = {
-  apiKeyOpenai: { category: 'apiKey', encrypted: true, required: true },
-  apiKeyAnthropic: { category: 'apiKey', encrypted: true, required: true },
-  apiKeyGoogle: { category: 'apiKey', encrypted: true, required: true },
+  apiKeyOpenai: {
+    category: 'apiKey',
+    encrypted: true,
+    dataType: 'string' as const,
+    ...constraints.apiKeyOpenai,
+  },
+  apiKeyAnthropic: {
+    category: 'apiKey',
+    encrypted: true,
+    dataType: 'string' as const,
+    ...constraints.apiKeyAnthropic,
+  },
+  apiKeyGoogle: {
+    category: 'apiKey',
+    encrypted: true,
+    dataType: 'string' as const,
+    ...constraints.apiKeyGoogle,
+  },
 } as const
 
 export type UserSettingWithValidation = {
@@ -31,20 +62,39 @@ export type UserSettingWithValidation = {
   readonly maxValue?: number
 }
 
-// Derive UI hints from schemas + metadata
-export function getSettingDefinition(key: string) {
+export function getSettingDefinition(
+  key: string
+): Omit<UserSettingWithValidation, 'settingKey' | 'settingValue' | 'updatedAt'> | undefined {
   const schema = settingSchemas[key as SettingKey]
   const metadata = settingMetadata[key as SettingKey]
 
   if (!schema || !metadata) return undefined
 
   return {
+    category: metadata.category,
+    encrypted: metadata.encrypted,
+    dataType: metadata.dataType,
     required: metadata.required,
     description: schema.description ?? '',
-    category: metadata.category,
-    minLength: schema.minLength ?? undefined,
-    maxLength: schema.maxLength ?? undefined,
-    minValue: undefined,
-    maxValue: undefined,
+    minLength: ('minLength' in metadata ? metadata.minLength : undefined) as number | undefined,
+    maxLength: ('maxLength' in metadata ? metadata.maxLength : undefined) as number | undefined,
+    minValue: ('minValue' in metadata ? metadata.minValue : undefined) as number | undefined,
+    maxValue: ('maxValue' in metadata ? metadata.maxValue : undefined) as number | undefined,
   }
+}
+
+export function validateSetting(key: string, value: unknown) {
+  const schema = settingSchemas[key as SettingKey]
+  if (!schema) return { success: false as const, error: `Unknown setting: ${key}` }
+
+  const result = schema.safeParse(value)
+  return result.success
+    ? { success: true as const, data: result.data }
+    : { success: false as const, error: result.error.issues[0]?.message ?? 'Validation failed' }
+}
+
+export function getSettingsByCategory(category: string): SettingKey[] {
+  return Object.entries(settingMetadata)
+    .filter(([_, meta]) => meta.category === category)
+    .map(([key]) => key as SettingKey)
 }
