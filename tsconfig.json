@@ -3,7 +3,7 @@
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": "./",
-    "sourceRoot": "./src",
+    // "sourceRoot": "./src",
     "sourceMap": true,
     "experimentalDecorators": true,
     "erasableSyntaxOnly": false,
