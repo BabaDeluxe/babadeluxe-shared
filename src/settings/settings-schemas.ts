@@ -98,3 +98,16 @@ export function getSettingsByCategory(category: string): SettingKey[] {
     .filter(([_, meta]) => meta.category === category)
     .map(([key]) => key as SettingKey)
 }
+
+export function getApiProviders() {
+  return getSettingsByCategory('apiKey').map((key) => {
+    const meta = settingMetadata[key]
+    const schema = settingSchemas[key]
+    return {
+      key,
+      name: key.replace('apiKey', ''),
+      required: meta.required,
+      description: schema.description,
+    }
+  })
+}
