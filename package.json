@@ -29,16 +29,6 @@
       "types": "./dist/settings/index.d.ts",
       "import": "./dist/settings/index.mjs",
       "require": "./dist/settings/index.cjs"
-    },
-    "./socket": {
-      "types": "./dist/socket/index.d.ts",
-      "import": "./dist/socket/index.mjs",
-      "require": "./dist/socket/index.cjs"
-    },
-    "./validators": {
-      "types": "./dist/validators/index.d.ts",
-      "import": "./dist/validators/index.mjs",
-      "require": "./dist/validators/index.cjs"
     }
   },
   "scripts": {
