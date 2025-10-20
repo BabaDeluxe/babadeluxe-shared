@@ -23,7 +23,7 @@ export namespace Root {
             data: any[];
             error?: string | undefined;
         }) => void) => void;
-        update: (p1: {
+        upsert: (p1: {
             settingKey: string;
             settingValue: unknown;
             dataType: "string" | "number" | "boolean";
