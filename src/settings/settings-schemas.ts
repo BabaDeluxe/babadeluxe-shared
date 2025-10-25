@@ -152,7 +152,7 @@ export const userSettingWithValidationSchema = z.object({
   settingKey: z.string(),
   settingValue: z.unknown(),
   dataType: z.enum(['string', 'number', 'boolean']),
-  updatedAt: z.iso.datetime,
+  updatedAt: z.iso.datetime(),
   required: z.boolean(),
   minLength: z.number().optional(),
   maxLength: z.number().optional(),
