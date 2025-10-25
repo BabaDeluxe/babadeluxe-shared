@@ -11,6 +11,15 @@ fi
 # Capture the list of originally staged files
 STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM)
 
+# Check if any .ts files in src/ changed (excluding index.ts barrel files)
+if echo "$STAGED_FILES" | grep -q "^src/.*\.ts$" | grep -v "index\.ts$"; then
+  echo "Source files changed, regenerating barrel files..."
+  npm run generate-barrels
+
+  # Stage the updated barrel files
+  git add "**/index.ts"
+fi
+
 # Format JavaScript code
 npm run format
 
