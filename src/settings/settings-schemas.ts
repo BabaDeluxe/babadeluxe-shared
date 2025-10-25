@@ -62,6 +62,21 @@ export type UserSettingWithValidation = {
   readonly maxValue?: number
 }
 
+export const userSettingWithValidationSchema = z.object({
+  settingKey: z.string(),
+  settingValue: z.unknown(),
+  dataType: z.enum(['string', 'number', 'boolean']),
+  updatedAt: z.iso.datetime(),
+  required: z.boolean(),
+  minLength: z.number().optional(),
+  maxLength: z.number().optional(),
+  minValue: z.number().optional(),
+  maxValue: z.number().optional(),
+  description: z.string(),
+  category: z.string(),
+  encrypted: z.boolean(),
+})
+
 export function getSettingDefinition(
   key: string
 ): Omit<UserSettingWithValidation, 'settingKey' | 'settingValue' | 'updatedAt'> | undefined {
