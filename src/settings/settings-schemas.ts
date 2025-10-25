@@ -14,7 +14,7 @@
  * @module settings-schemas
  */
 
-import { z } from 'zod'
+import { z } from 'zod/v4'
 
 /**
  * Validation constraints for each setting.

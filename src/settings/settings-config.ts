@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from 'zod/v4'
 import { createSimpleConfig } from 'zod-sockets'
 
 export const settingsSocketConfig = createSimpleConfig({
