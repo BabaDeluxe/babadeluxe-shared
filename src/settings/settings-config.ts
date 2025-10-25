@@ -9,10 +9,7 @@ export const settingsSocketConfig = createSimpleConfig({
           settingKey: z.string(),
           settingValue: z.unknown(),
           dataType: z.enum(['string', 'number', 'boolean']),
-          updatedAt: z
-            .date()
-            .transform((date) => date.toISOString())
-            .pipe(z.iso.datetime()),
+          updatedAt: z.iso.datetime(),
         }),
       ]),
     },
