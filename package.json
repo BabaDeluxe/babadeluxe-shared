@@ -34,7 +34,7 @@
   "scripts": {
     "format": "xo . --fix --prettier",
     "prebuild": "npx rimraf -g ./dist/** ./src/**/index.ts && barrelsby --config ./.barrelsby.json",
-    "build": "npm run-script prebuild && unbuild",
+    "build": "unbuild",
     "test-package": "npm pack --dry-run",
     "publish-patch": "npm run build && npm version patch && npm publish",
     "publish-minor": "npm run build && npm version minor && npm publish",
