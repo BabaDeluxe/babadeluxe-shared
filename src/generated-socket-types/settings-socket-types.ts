@@ -20,7 +20,20 @@ export namespace Root {
     export interface Actions {
         getAll: (cb1: (p1: {
             success: boolean;
-            data: any[];
+            data: {
+                settingKey: string;
+                settingValue: unknown;
+                dataType: "string" | "number" | "boolean";
+                updatedAt: string;
+                required: boolean;
+                minLength?: number | undefined;
+                maxLength?: number | undefined;
+                minValue?: number | undefined;
+                maxValue?: number | undefined;
+                description: string;
+                category: string;
+                encrypted: boolean;
+            }[];
             error?: string | undefined;
         }) => void) => void;
         upsert: (p1: {
