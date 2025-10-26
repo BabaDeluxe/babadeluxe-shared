@@ -284,3 +284,26 @@ export function getApiProviders() {
     }
   })
 }
+
+/**
+ * Wire-safe type for socket transmission (Date → ISO string)
+ */
+export type UserSettingWire = Omit<UserSettingWithValidation, 'updatedAt'> & {
+  readonly updatedAt: string
+}
+
+/**
+ * Transform runtime type to wire-safe format
+ */
+export const toWire = (setting: UserSettingWithValidation): UserSettingWire => ({
+  ...setting,
+  updatedAt: setting.updatedAt.toISOString(),
+})
+
+/**
+ * Transform wire format back to runtime type
+ */
+export const fromWire = (setting: UserSettingWire): UserSettingWithValidation => ({
+  ...setting,
+  updatedAt: new Date(setting.updatedAt),
+})
