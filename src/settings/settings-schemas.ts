@@ -276,9 +276,14 @@ export function getApiProviders() {
   return getSettingsByCategory('apiKey').map((key) => {
     const meta = settingMetadata[key]
     const schema = settingSchemas[key]
+    let name = key.replace('apiKey', '')
+
+    // Fix casing for specific providers
+    if (name === 'Openai') name = 'OpenAI'
+
     return {
       key,
-      name: key.replace('apiKey', ''),
+      name,
       required: meta.required,
       description: schema.description,
     }
