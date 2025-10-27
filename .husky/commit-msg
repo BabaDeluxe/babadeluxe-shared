@@ -1,0 +1,9 @@
+#!/bin/sh
+
+# Runs after commit message is written
+
+# Backup the message in case something fails later
+cp "$1" .git/COMMIT_ABORTEDMSG
+
+# Your validation here...
+# If validation fails, exit 1

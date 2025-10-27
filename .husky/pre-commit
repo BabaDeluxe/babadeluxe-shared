@@ -1,27 +1,25 @@
-#!/bin/bash
+#!/bin/sh
+set -e
 
-# Store the original commit message
-COMMIT_MSG_FILE="$GIT_DIR/COMMIT_EDITMSG"
-if [ -f "$COMMIT_MSG_FILE" ]; then
-  COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
-else
-  COMMIT_MSG=""
-fi
+# Capture originally staged files
+ORIG_STAGED="$(git diff --cached --name-only)"
 
-# Capture the list of originally staged files
-STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM)
+# Generate barrels
+npm run generate-barrels || { echo "❌ Barrel generation failed"; exit 1; }
 
-npm run generate-barrels
+# Find new untracked barrel files
+NEW_BARRELS="$(git ls-files -o --exclude-standard -- '*index.ts')"
 
-# Format JavaScript code
+# Format (modifies files in working directory)
 npm run format
 
-# Only re-stage the files that were originally staged (if they were modified by formatting)
-if [ -n "$STAGED_FILES" ]; then
-  echo "$STAGED_FILES" | xargs git add
-
-  # Reapply the original commit message
-  if [ -n "$COMMIT_MSG" ]; then
-    echo "$COMMIT_MSG" > "$COMMIT_MSG_FILE"
-  fi
+# Stage everything in one pass: originally staged + new barrels
+if [ -n "$ORIG_STAGED" ]; then
+  echo "$ORIG_STAGED" | xargs git add
 fi
+
+if [ -n "$NEW_BARRELS" ]; then
+  echo "$NEW_BARRELS" | xargs git add
+fi
+
+exit 0
