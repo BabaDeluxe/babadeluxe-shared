@@ -2,6 +2,8 @@
 {
     "editor.formatOnSave": true,
     "editor.formatOnType": false, // required
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
     "xo.enable": true,
     "xo.format.enable": true,
     "eslint.enable": false,
