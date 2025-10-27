@@ -3,6 +3,7 @@
  */
 
 export * from './active-chat-item-emitter'
+export * from './chat-socket-config'
 export * from './execute-prompt-result'
 export * from './model-option'
 export * from './webview-enum'
