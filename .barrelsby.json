@@ -6,7 +6,8 @@
         "\\.spec\\.ts$",
         "\\.test\\.ts$",
         "\\.d\\.ts$",
-        "(.*)node_modules(.*)"
+        "(.*)node_modules(.*)",
+        "./src/generated-socket-types"
     ],
     "delete": true,
     "mode": "all",

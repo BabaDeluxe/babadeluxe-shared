@@ -32,13 +32,13 @@
     }
   },
   "scripts": {
-    "format": "xo . --fix --prettier",
+    "format": "xo --fix --prettier",
+    "generate-barrels": "barrelsby --config ./.barrelsby.json",
     "build": "unbuild",
     "test-package": "npm pack --dry-run",
     "publish-patch": "npm run build && npm version patch && npm publish",
     "publish-minor": "npm run build && npm version minor && npm publish",
     "publish-major": "npm run build && npm version major && npm publish",
-    "generate-barrels": "npx rimraf -g ./src/**/index.ts && barrelsby --config ./.barrelsby.json",
     "prepare": "husky"
   },
   "dependencies": {

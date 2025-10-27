@@ -4,22 +4,18 @@ set -e
 # Capture originally staged files
 ORIG_STAGED="$(git diff --cached --name-only)"
 
-# Generate barrels
+# Generate barrels (deletes and recreates index.ts files)
 npm run generate-barrels || { echo "❌ Barrel generation failed"; exit 1; }
-
-# Find new untracked barrel files
-NEW_BARRELS="$(git ls-files -o --exclude-standard -- '*index.ts')"
 
 # Format (modifies files in working directory)
 npm run format
 
-# Stage everything in one pass: originally staged + new barrels
+# Re-stage originally staged files
 if [ -n "$ORIG_STAGED" ]; then
   echo "$ORIG_STAGED" | xargs git add
 fi
 
-if [ -n "$NEW_BARRELS" ]; then
-  echo "$NEW_BARRELS" | xargs git add
-fi
+# Add ALL barrel files (new, modified, or recreated)
+find src -name "index.ts" -type f | xargs -r git add
 
 exit 0
