@@ -7,20 +7,15 @@ ORIG_STAGED="$(git diff --cached --name-only)"
 # Generate barrels
 npm run generate-barrels || { echo "❌ Barrel generation failed"; exit 1; }
 
-# Find new untracked barrel files
-NEW_BARRELS="$(git ls-files -o --exclude-standard -- '*index.ts')"
-
-# Format (modifies files in working directory)
+# Format
 npm run format
 
 # Re-stage originally staged files (handles modifications AND deletions)
 if [ -n "$ORIG_STAGED" ]; then
-  echo "$ORIG_STAGED" | xargs git add -u
+  echo "$ORIG_STAGED" | xargs git add --all --
 fi
 
-# Add new barrel files (use regular git add, not -u)
-if [ -n "$NEW_BARRELS" ]; then
-  echo "$NEW_BARRELS" | xargs git add
-fi
+# Add newly created barrel files
+git ls-files -o --exclude-standard -- 'src/**/index.ts' | xargs -r git add
 
 exit 0
