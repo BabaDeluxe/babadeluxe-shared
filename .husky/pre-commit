@@ -12,7 +12,7 @@ npm run format
 
 # Re-stage originally staged files (handles modifications AND deletions)
 if [ -n "$ORIG_STAGED" ]; then
-  echo "$ORIG_STAGED" | xargs git add --all --
+  git add -A -- "$ORIG_STAGED"
 fi
 
 # Add newly created barrel files
