@@ -1,6 +1,7 @@
 import { z } from 'zod/v4'
+import { createSimpleConfig } from 'zod-sockets'
 
-export const settingsSocketConfig = {
+export const settingsSocketConfig = createSimpleConfig({
   emission: {
     updated: {
       schema: z.tuple([
@@ -19,4 +20,4 @@ export const settingsSocketConfig = {
       schema: z.tuple([z.object({ error: z.string() })]),
     },
   },
-}
+})

@@ -1,6 +1,7 @@
 import { z } from 'zod/v4'
+import { createSimpleConfig } from 'zod-sockets'
 
-export const chatSocketConfig = {
+export const chatSocketConfig = createSimpleConfig({
   // Server -> Client
   emission: {
     messageChunk: {
@@ -35,4 +36,4 @@ export const chatSocketConfig = {
       ]),
     },
   },
-}
+})
