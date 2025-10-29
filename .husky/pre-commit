@@ -6,7 +6,7 @@ ORIG_STAGED="$(git diff --cached --name-only)"
 npm run generate-barrels || { echo "❌ Barrel generation failed"; exit 1; }
 npm run format
 
-# Only re-stage files that EXIST and were modified by our scripts
+# Re-stage originally staged files that still exist
 if [ -n "$ORIG_STAGED" ]; then
   echo "$ORIG_STAGED" | while IFS= read -r file; do
     if [ -f "$file" ]; then
@@ -15,7 +15,7 @@ if [ -n "$ORIG_STAGED" ]; then
   done
 fi
 
-# Add new barrels
-git ls-files -o --exclude-standard -- 'src/**/index.ts' | xargs -r git add
+# Add ALL barrel files (new AND modified)
+find src -name "index.ts" -type f -exec git add {} +
 
 exit 0
