@@ -3,7 +3,6 @@
  */
 
 export * from './chat-socket-config'
-export * from './webview-enum'
 export * from './entities/index'
 export * from './model/index'
 export * from './settings/index'
