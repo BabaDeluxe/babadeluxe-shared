@@ -4,4 +4,3 @@
 
 export * from './model-option'
 export * from './model-socket-config'
-export * from './model-socket-schemas'
