@@ -1,18 +1,16 @@
 #!/bin/sh
-set -ex
+set -e
 
 ORIG_STAGED="$(git diff --cached --name-only)"
 
 npm run generate-barrels || { echo "❌ Barrel generation failed"; exit 1; }
 npm run format
 
-# Re-add each file individually, properly quoted
+# Only re-stage files that EXIST and were modified by our scripts
 if [ -n "$ORIG_STAGED" ]; then
   echo "$ORIG_STAGED" | while IFS= read -r file; do
     if [ -f "$file" ]; then
       git add "$file"
-    else
-      git add -u "$file"
     fi
   done
 fi
