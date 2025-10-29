@@ -121,7 +121,7 @@ export type UserSettingWithValidation = {
   readonly settingKey: string
   readonly settingValue: unknown
   readonly dataType: 'string' | 'number' | 'boolean'
-  readonly updatedAt: Date // ← Date object for frontend
+  readonly updatedAt: Date // Date object for frontend
   readonly category: string
   readonly encrypted: boolean
   readonly required: boolean

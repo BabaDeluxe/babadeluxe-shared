@@ -1,5 +1,3 @@
-import { createSimpleConfig } from 'zod-sockets'
-
-export const modelSocketConfig = createSimpleConfig({
+export const modelSocketConfig = {
   emission: {},
-})
+}

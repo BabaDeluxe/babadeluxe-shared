@@ -6,15 +6,6 @@ export namespace Root {
     export interface Emission {
     }
     export interface Actions {
-        listAllModels: (cb1: (p1: {
-            success: boolean;
-            models?: {
-                openai: string[];
-                anthropic: string[];
-                gemini: string[];
-            } | undefined;
-            error?: string | undefined;
-        }) => void) => void;
     }
     /** @example const socket: Root.Socket = io(Root.path) */
     export type Socket = SocketBase<Emission, Actions>;

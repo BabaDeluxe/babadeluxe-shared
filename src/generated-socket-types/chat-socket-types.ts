@@ -21,22 +21,6 @@ export namespace Root {
         }) => void;
     }
     export interface Actions {
-        sendMessage: (p1: {
-            messageId: number;
-            provider: string;
-            modelId: string;
-            prompt: string;
-        }, cb2: (p1: {
-            success: boolean;
-            error?: string | undefined;
-        }) => void) => void;
-        abortMessage: (p1: {
-            messageId: number;
-            deleteMessage?: boolean | undefined;
-        }, cb2: (p1: {
-            success: boolean;
-            error?: string | undefined;
-        }) => void) => void;
     }
     /** @example const socket: Root.Socket = io(Root.path) */
     export type Socket = SocketBase<Emission, Actions>;
