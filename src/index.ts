@@ -4,8 +4,7 @@
 
 export * from './active-chat-item-emitter'
 export * from './chat-socket-config'
-export * from './model/model-option'
-export * from './model/model-socket-config'
 export * from './webview-enum'
 export * from './entities/index'
+export * from './model/index'
 export * from './settings/index'
