@@ -1,21 +1,23 @@
 #!/bin/sh
-set -e
+set -ex
 
-# Capture originally staged files
 ORIG_STAGED="$(git diff --cached --name-only)"
 
-# Generate barrels
 npm run generate-barrels || { echo "❌ Barrel generation failed"; exit 1; }
-
-# Format
 npm run format
 
-# Re-stage originally staged files (handles modifications AND deletions)
+# Re-add each file individually, properly quoted
 if [ -n "$ORIG_STAGED" ]; then
-  git add -A -- "$ORIG_STAGED"
+  echo "$ORIG_STAGED" | while IFS= read -r file; do
+    if [ -f "$file" ]; then
+      git add "$file"
+    else
+      git add -u "$file"
+    fi
+  done
 fi
 
-# Add newly created barrel files
+# Add new barrels
 git ls-files -o --exclude-standard -- 'src/**/index.ts' | xargs -r git add
 
 exit 0
