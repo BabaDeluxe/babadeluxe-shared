@@ -3,4 +3,3 @@
  */
 
 export * from './model-option'
-export * from './model-socket-config'
