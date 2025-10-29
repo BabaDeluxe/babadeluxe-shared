@@ -3,5 +3,6 @@
  */
 
 export * from './entities/index'
+export * from './generated-socket-types/index'
 export * from './model/index'
 export * from './settings/index'
