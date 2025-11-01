@@ -171,6 +171,7 @@ export namespace Prompts {
                 template: string;
                 description?: string | undefined;
                 isActive: boolean;
+                isSystem: boolean;
                 createdAt: string;
                 updatedAt: string;
             }[];
