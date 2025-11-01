@@ -117,12 +117,58 @@ export namespace Models {
     export type Socket = SocketBase<Emission, Actions>;
 }
 
+export namespace Validation {
+    /** @desc The actual path of the Validation namespace */
+    export const path = "/validation";
+    export interface Emission {
+    }
+    export interface Actions {
+        validateApiKey: (p1: {
+            provider: "openai" | "anthropic" | "google";
+            apiKey: string;
+        }, cb2: (p1: {
+            type: "valid";
+            provider: string;
+            statusCode: number;
+        } | {
+            type: "recognized";
+            provider: string;
+            statusCode: number;
+            reason: "bad_request" | "rate_limited";
+        } | {
+            type: "invalid_key";
+            provider: string;
+            statusCode: number;
+        } | {
+            type: "network_error";
+            provider: string;
+            cause: unknown;
+        } | {
+            type: "server_error";
+            provider: string;
+            statusCode: number;
+        } | {
+            type: "unsupported_provider";
+            provider: string;
+        }) => void) => void;
+    }
+    /** @example const socket: Validation.Socket = io(Validation.path) */
+    export type Socket = SocketBase<Emission, Actions>;
+}
+
 export namespace Prompts {
     /** @desc The actual path of the Prompts namespace */
     export const path = "/prompts";
     export interface Emission {
     }
     export interface Actions {
+        getPrompt: (p1: {
+            command: string;
+        }, cb2: (p1: {
+            success: boolean;
+            template?: string | undefined;
+            error?: string | undefined;
+        }) => void) => void;
     }
     /** @example const socket: Prompts.Socket = io(Prompts.path) */
     export type Socket = SocketBase<Emission, Actions>;
