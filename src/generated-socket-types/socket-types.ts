@@ -162,6 +162,53 @@ export namespace Prompts {
     export interface Emission {
     }
     export interface Actions {
+        getPrompts: (cb1: (p1: {
+            success: boolean;
+            data: {
+                id: number;
+                name: string;
+                command: string;
+                template: string;
+                description?: string | undefined;
+                isActive: boolean;
+                createdAt: string;
+                updatedAt: string;
+            }[];
+            error?: string | undefined;
+        }) => void) => void;
+        createPrompt: (p1: {
+            name: string;
+            command: string;
+            template: string;
+            description?: string | undefined;
+        }, cb2: (p1: {
+            success: boolean;
+            data?: {
+                id: number;
+                name: string;
+                command: string;
+                template: string;
+                description?: string | undefined;
+            } | undefined;
+            error?: string | undefined;
+        }) => void) => void;
+        updatePrompt: (p1: {
+            id: number;
+            name?: string | undefined;
+            command?: string | undefined;
+            template?: string | undefined;
+            description?: string | undefined;
+            isActive?: boolean | undefined;
+        }, cb2: (p1: {
+            success: boolean;
+            error?: string | undefined;
+        }) => void) => void;
+        deletePrompt: (p1: {
+            id: number;
+        }, cb2: (p1: {
+            success: boolean;
+            error?: string | undefined;
+        }) => void) => void;
         getPrompt: (p1: {
             command: string;
         }, cb2: (p1: {
