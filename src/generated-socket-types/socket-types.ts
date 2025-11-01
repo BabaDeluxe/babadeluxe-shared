@@ -116,3 +116,14 @@ export namespace Models {
     /** @example const socket: Models.Socket = io(Models.path) */
     export type Socket = SocketBase<Emission, Actions>;
 }
+
+export namespace Prompts {
+    /** @desc The actual path of the Prompts namespace */
+    export const path = "/prompts";
+    export interface Emission {
+    }
+    export interface Actions {
+    }
+    /** @example const socket: Prompts.Socket = io(Prompts.path) */
+    export type Socket = SocketBase<Emission, Actions>;
+}
