@@ -160,6 +160,33 @@ export namespace Prompts {
     /** @desc The actual path of the Prompts namespace */
     export const path = "/prompts";
     export interface Emission {
+        promptCreated: (p1: {
+            id: number;
+            name: string;
+            command: string;
+            template: string;
+            description?: string | undefined;
+            isActive: boolean;
+            isSystem: boolean;
+            createdAt: string;
+            updatedAt: string;
+            userId: string;
+        }) => void;
+        promptUpdated: (p1: {
+            id: number;
+            name?: string | undefined;
+            command?: string | undefined;
+            template?: string | undefined;
+            description?: string | undefined;
+            isActive?: boolean | undefined;
+            isSystem?: boolean | undefined;
+            updatedAt: string;
+            userId: string;
+        }) => void;
+        promptDeleted: (p1: {
+            id: number;
+            userId: string;
+        }) => void;
     }
     export interface Actions {
         getPrompts: (cb1: (p1: {
@@ -184,13 +211,6 @@ export namespace Prompts {
             description?: string | undefined;
         }, cb2: (p1: {
             success: boolean;
-            data?: {
-                id: number;
-                name: string;
-                command: string;
-                template: string;
-                description?: string | undefined;
-            } | undefined;
             error?: string | undefined;
         }) => void) => void;
         updatePrompt: (p1: {
