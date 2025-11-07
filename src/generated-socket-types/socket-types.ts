@@ -241,3 +241,26 @@ export namespace Prompts {
     /** @example const socket: Prompts.Socket = io(Prompts.path) */
     export type Socket = SocketBase<Emission, Actions>;
 }
+
+export namespace Subscription {
+    /** @desc The actual path of the Subscription namespace */
+    export const path = "/subscription";
+    export interface Emission {
+        messageLimitReached: (p1: {}) => void;
+        userTierChanged: (p1: {
+            tier: "free" | "pro";
+        }) => void;
+        checkoutSessionError: (p1: {
+            error: string;
+        }) => void;
+    }
+    export interface Actions {
+        createCheckoutSession: (cb1: (p1: {
+            success: boolean;
+            checkoutUrl?: string | undefined;
+            error?: string | undefined;
+        }) => void) => void;
+    }
+    /** @example const socket: Subscription.Socket = io(Subscription.path) */
+    export type Socket = SocketBase<Emission, Actions>;
+}
