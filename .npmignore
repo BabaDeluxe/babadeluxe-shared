@@ -4,12 +4,10 @@ src/
 .vscode/
 .husky/
 *.log
+*.old
 .env*
 tsconfig.json
-.*
 example.npmrc
 test-package.sh
-package.json
 package-lock.json
 xo[.-]config.ts
-*.md
