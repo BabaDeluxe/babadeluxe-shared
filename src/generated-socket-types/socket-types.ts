@@ -1,24 +1,73 @@
 import type { Socket as SocketBase } from "socket.io-client";
 
-export namespace Settings {
-    /** @desc The actual path of the Settings namespace */
-    export const path = "/settings";
+export namespace Root {
+    /** @desc The actual path of the Root namespace */
+    export const path = "/";
     export interface Emission {
-        updated: (p1: {
+        "settings:updated": (p1: {
             settingKey: string;
             settingValue: unknown;
             dataType: "string" | "number" | "boolean";
             updatedAt: string;
         }) => void;
-        deleted: (p1: {
+        "settings:deleted": (p1: {
             settingKey: string;
         }) => void;
-        error: (p1: {
+        "settings:error": (p1: {
+            error: string;
+        }) => void;
+        "chat:messageChunk": (p1: {
+            messageId: number;
+            chunk: string;
+        }) => void;
+        "chat:messageComplete": (p1: {
+            messageId: number;
+            fullContent: string;
+        }) => void;
+        "chat:messageDeleted": (p1: {
+            messageId: number;
+        }) => void;
+        "chat:chatError": (p1: {
+            messageId?: number | undefined;
+            error: string;
+        }) => void;
+        "prompts:promptCreated": (p1: {
+            id: number;
+            name: string;
+            command: string;
+            template: string;
+            description?: string | undefined;
+            isActive: boolean;
+            isSystem: boolean;
+            createdAt: string;
+            updatedAt: string;
+            userId: string;
+        }) => void;
+        "prompts:promptUpdated": (p1: {
+            id: number;
+            name?: string | undefined;
+            command?: string | undefined;
+            template?: string | undefined;
+            description?: string | undefined;
+            isActive?: boolean | undefined;
+            isSystem?: boolean | undefined;
+            updatedAt: string;
+            userId: string;
+        }) => void;
+        "prompts:promptDeleted": (p1: {
+            id: number;
+            userId: string;
+        }) => void;
+        "subscription:messageLimitReached": (p1: {}) => void;
+        "subscription:userTierChanged": (p1: {
+            tier: "free" | "pro";
+        }) => void;
+        "subscription:checkoutSessionError": (p1: {
             error: string;
         }) => void;
     }
     export interface Actions {
-        getAll: (cb1: (p1: {
+        "settings:getAll": (cb1: (p1: {
             success: boolean;
             data: {
                 settingKey: string;
@@ -36,7 +85,7 @@ export namespace Settings {
             }[];
             error?: string | undefined;
         }) => void) => void;
-        upsert: (p1: {
+        "settings:upsert": (p1: {
             settingKey: string;
             settingValue: unknown;
             dataType: "string" | "number" | "boolean";
@@ -44,39 +93,13 @@ export namespace Settings {
             success: boolean;
             error?: string | undefined;
         }) => void) => void;
-        delete: (p1: {
+        "settings:delete": (p1: {
             settingKey: string;
         }, cb2: (p1: {
             success: boolean;
             error?: string | undefined;
         }) => void) => void;
-    }
-    /** @example const socket: Settings.Socket = io(Settings.path) */
-    export type Socket = SocketBase<Emission, Actions>;
-}
-
-export namespace Chat {
-    /** @desc The actual path of the Chat namespace */
-    export const path = "/chat";
-    export interface Emission {
-        messageChunk: (p1: {
-            messageId: number;
-            chunk: string;
-        }) => void;
-        messageComplete: (p1: {
-            messageId: number;
-            fullContent: string;
-        }) => void;
-        messageDeleted: (p1: {
-            messageId: number;
-        }) => void;
-        chatError: (p1: {
-            messageId?: number | undefined;
-            error: string;
-        }) => void;
-    }
-    export interface Actions {
-        sendMessage: (p1: {
+        "chat:sendMessage": (p1: {
             messageId: number;
             provider: string;
             modelId: string;
@@ -85,25 +108,14 @@ export namespace Chat {
             success: boolean;
             error?: string | undefined;
         }) => void) => void;
-        abortMessage: (p1: {
+        "chat:abortMessage": (p1: {
             messageId: number;
             deleteMessage?: boolean | undefined;
         }, cb2: (p1: {
             success: boolean;
             error?: string | undefined;
         }) => void) => void;
-    }
-    /** @example const socket: Chat.Socket = io(Chat.path) */
-    export type Socket = SocketBase<Emission, Actions>;
-}
-
-export namespace Models {
-    /** @desc The actual path of the Models namespace */
-    export const path = "/models";
-    export interface Emission {
-    }
-    export interface Actions {
-        listAllModels: (cb1: (p1: {
+        "models:listAllModels": (cb1: (p1: {
             success: boolean;
             models?: {
                 openai: string[];
@@ -112,18 +124,7 @@ export namespace Models {
             } | undefined;
             error?: string | undefined;
         }) => void) => void;
-    }
-    /** @example const socket: Models.Socket = io(Models.path) */
-    export type Socket = SocketBase<Emission, Actions>;
-}
-
-export namespace Validation {
-    /** @desc The actual path of the Validation namespace */
-    export const path = "/validation";
-    export interface Emission {
-    }
-    export interface Actions {
-        validateApiKey: (p1: {
+        "validation:validateApiKey": (p1: {
             provider: "openai" | "anthropic" | "google";
             apiKey: string;
         }, cb2: (p1: {
@@ -151,45 +152,7 @@ export namespace Validation {
             type: "unsupported_provider";
             provider: string;
         }) => void) => void;
-    }
-    /** @example const socket: Validation.Socket = io(Validation.path) */
-    export type Socket = SocketBase<Emission, Actions>;
-}
-
-export namespace Prompts {
-    /** @desc The actual path of the Prompts namespace */
-    export const path = "/prompts";
-    export interface Emission {
-        promptCreated: (p1: {
-            id: number;
-            name: string;
-            command: string;
-            template: string;
-            description?: string | undefined;
-            isActive: boolean;
-            isSystem: boolean;
-            createdAt: string;
-            updatedAt: string;
-            userId: string;
-        }) => void;
-        promptUpdated: (p1: {
-            id: number;
-            name?: string | undefined;
-            command?: string | undefined;
-            template?: string | undefined;
-            description?: string | undefined;
-            isActive?: boolean | undefined;
-            isSystem?: boolean | undefined;
-            updatedAt: string;
-            userId: string;
-        }) => void;
-        promptDeleted: (p1: {
-            id: number;
-            userId: string;
-        }) => void;
-    }
-    export interface Actions {
-        getPrompts: (cb1: (p1: {
+        "prompts:getPrompts": (cb1: (p1: {
             success: boolean;
             data: {
                 id: number;
@@ -204,7 +167,7 @@ export namespace Prompts {
             }[];
             error?: string | undefined;
         }) => void) => void;
-        createPrompt: (p1: {
+        "prompts:createPrompt": (p1: {
             name: string;
             command: string;
             template: string;
@@ -213,7 +176,7 @@ export namespace Prompts {
             success: boolean;
             error?: string | undefined;
         }) => void) => void;
-        updatePrompt: (p1: {
+        "prompts:updatePrompt": (p1: {
             id: number;
             name?: string | undefined;
             command?: string | undefined;
@@ -224,43 +187,25 @@ export namespace Prompts {
             success: boolean;
             error?: string | undefined;
         }) => void) => void;
-        deletePrompt: (p1: {
+        "prompts:deletePrompt": (p1: {
             id: number;
         }, cb2: (p1: {
             success: boolean;
             error?: string | undefined;
         }) => void) => void;
-        getPrompt: (p1: {
+        "prompts:getPrompt": (p1: {
             command: string;
         }, cb2: (p1: {
             success: boolean;
             template?: string | undefined;
             error?: string | undefined;
         }) => void) => void;
-    }
-    /** @example const socket: Prompts.Socket = io(Prompts.path) */
-    export type Socket = SocketBase<Emission, Actions>;
-}
-
-export namespace Subscription {
-    /** @desc The actual path of the Subscription namespace */
-    export const path = "/subscription";
-    export interface Emission {
-        messageLimitReached: (p1: {}) => void;
-        userTierChanged: (p1: {
-            tier: "free" | "pro";
-        }) => void;
-        checkoutSessionError: (p1: {
-            error: string;
-        }) => void;
-    }
-    export interface Actions {
-        createCheckoutSession: (cb1: (p1: {
+        "subscription:createCheckoutSession": (cb1: (p1: {
             success: boolean;
             checkoutUrl?: string | undefined;
             error?: string | undefined;
         }) => void) => void;
     }
-    /** @example const socket: Subscription.Socket = io(Subscription.path) */
+    /** @example const socket: Root.Socket = io(Root.path) */
     export type Socket = SocketBase<Emission, Actions>;
 }
