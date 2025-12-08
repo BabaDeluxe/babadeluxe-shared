@@ -5,9 +5,15 @@ src/
 .husky/
 *.log
 *.old
+.barrelsby.json
+.editorconfig
+.gitattributes
+.gitignore
+.npmignore
+.npmrc
+.prettierrc
 .env*
 tsconfig.json
 example.npmrc
-test-package.sh
 package-lock.json
 xo[.-]config.ts

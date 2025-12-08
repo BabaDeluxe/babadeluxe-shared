@@ -11,6 +11,6 @@ logs
 
 *.tsbuildinfo
 bundle-analysis.html
-.env
+.env*
 
 *.npmrc
