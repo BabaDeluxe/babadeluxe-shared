@@ -5,7 +5,7 @@
   "keywords": [
     "ts"
   ],
-  "description": "Shared code of babadeluxe including types and constants.",
+  "description": "Shared code of BabaDeluxe",
   "type": "module",
   "main": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
@@ -20,11 +20,6 @@
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
     },
-    "./entities": {
-      "types": "./dist/entities/index.d.ts",
-      "import": "./dist/entities/index.mjs",
-      "require": "./dist/entities/index.cjs"
-    },
     "./generated-socket-types": {
       "types": "./dist/generated-socket-types/index.d.ts",
       "import": "./dist/generated-socket-types/index.mjs",
@@ -34,6 +29,11 @@
       "types": "./dist/settings/index.d.ts",
       "import": "./dist/settings/index.mjs",
       "require": "./dist/settings/index.cjs"
+    },
+    "./utils": {
+      "types": "./dist/utils/index.d.ts",
+      "import": "./dist/utils/index.mjs",
+      "require": "./dist/utils/index.cjs"
     }
   },
   "scripts": {
@@ -53,14 +53,13 @@
   },
   "devDependencies": {
     "@babadeluxe/xo-config": "^0.3.2",
-    "@sindresorhus/tsconfig": "^8.0.1",
+    "@sindresorhus/tsconfig": "^8.1.0",
     "@typescript-eslint/eslint-plugin": "^8.43.0",
     "@typescript-eslint/parser": "^8.43.0",
     "barrelsby": "^2.8.1",
-    "concurrently": "^9.2.1",
+    "baseline-browser-mapping": "^2.9.8",
     "eslint": "^9.38.0",
     "husky": "^9.1.7",
-    "rimraf": "^6.0.1",
     "socket.io": "^4.8.1",
     "tsx": "^4.20.5",
     "typescript": "^5.9.2",
