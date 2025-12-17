@@ -122,9 +122,21 @@ export namespace Root {
         "models:listAllModels": (cb1: (p1: {
             success: boolean;
             models?: {
-                openai: string[];
-                anthropic: string[];
-                gemini: string[];
+                openai: {
+                    modelId: string;
+                    contextWindow?: number | undefined;
+                    source?: ("litellm" | "similarity" | "discovered") | undefined;
+                }[];
+                anthropic: {
+                    modelId: string;
+                    contextWindow?: number | undefined;
+                    source?: ("litellm" | "similarity" | "discovered") | undefined;
+                }[];
+                gemini: {
+                    modelId: string;
+                    contextWindow?: number | undefined;
+                    source?: ("litellm" | "similarity" | "discovered") | undefined;
+                }[];
             } | undefined;
             error?: string | undefined;
         }) => void) => void;
