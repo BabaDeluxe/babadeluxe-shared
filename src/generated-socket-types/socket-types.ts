@@ -103,7 +103,11 @@ export namespace Root {
             messageId: number;
             provider: string;
             modelId: string;
-            prompt: string;
+            messages: {
+                role: "user" | "assistant" | "system";
+                content: string;
+            }[];
+            systemPrompt?: string | undefined;
         }, cb2: (p1: {
             success: boolean;
             error?: string | undefined;
