@@ -125,17 +125,17 @@ export namespace Root {
                 openai: {
                     modelId: string;
                     contextWindow?: number | undefined;
-                    source?: ("litellm" | "similarity" | "discovered") | undefined;
+                    source?: ("litellm" | "discovered") | undefined;
                 }[];
                 anthropic: {
                     modelId: string;
                     contextWindow?: number | undefined;
-                    source?: ("litellm" | "similarity" | "discovered") | undefined;
+                    source?: ("litellm" | "discovered") | undefined;
                 }[];
                 gemini: {
                     modelId: string;
                     contextWindow?: number | undefined;
-                    source?: ("litellm" | "similarity" | "discovered") | undefined;
+                    source?: ("litellm" | "discovered") | undefined;
                 }[];
             } | undefined;
             error?: string | undefined;
