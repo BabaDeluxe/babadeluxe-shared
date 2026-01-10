@@ -7,7 +7,7 @@ export namespace Root {
         "settings:updated": (p1: {
             settingKey: string;
             settingValue: unknown;
-            dataType: "string" | "number" | "boolean";
+            dataType: string;
             updatedAt: string;
         }) => void;
         "settings:deleted": (p1: {
@@ -19,6 +19,7 @@ export namespace Root {
         "chat:messageChunk": (p1: {
             messageId: number;
             chunk: string;
+            sequence: number;
         }) => void;
         "chat:messageComplete": (p1: {
             messageId: number;
@@ -34,7 +35,7 @@ export namespace Root {
         "prompts:promptCreated": (p1: {
             id: number;
             name: string;
-            command: string;
+            command?: string | undefined;
             template: string;
             description?: string | undefined;
             isActive: boolean;
@@ -173,7 +174,7 @@ export namespace Root {
             data: {
                 id: number;
                 name: string;
-                command: string;
+                command?: string | undefined;
                 template: string;
                 description?: string | undefined;
                 isActive: boolean;
@@ -185,7 +186,7 @@ export namespace Root {
         }) => void) => void;
         "prompts:createPrompt": (p1: {
             name: string;
-            command: string;
+            command?: string | undefined;
             template: string;
             description?: string | undefined;
         }, cb2: (p1: {
