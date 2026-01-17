@@ -2,7 +2,7 @@ export class BaseError extends Error {
   public readonly namespace: string
 
   constructor(
-    public override message: string,
+    message: string,
     public override readonly cause?: Error,
     public readonly namespaceOverride?: string
   ) {
