@@ -109,6 +109,11 @@ export namespace Root {
                 content: string;
             }[];
             systemPrompt?: string | undefined;
+            contextItems?: {
+                kind: string;
+                filePath: string;
+                content: string;
+            }[] | undefined;
         }, cb2: (p1: {
             success: boolean;
             error?: string | undefined;
