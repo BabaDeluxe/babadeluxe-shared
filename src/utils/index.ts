@@ -4,3 +4,4 @@
 
 export * from './base-error'
 export * from './damerau-levenshtein'
+export * from './safe-json-parse'

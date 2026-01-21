@@ -1,37 +1,26 @@
-// Place your settings in this file to overwrite default and user settings.
 {
-    "editor.formatOnSave": true,
-    "editor.formatOnType": false, // required
-    "editor.tabSize": 2,
-    "editor.insertSpaces": true,
-    "xo.enable": true,
-    "xo.format.enable": true,
-    "eslint.enable": false,
-    "eslint.format.enable": false,
-    "conventionalCommits.silentAutoCommit": false,
-    "conventionalCommits.autoCommit": false,
-    "git.enableSmartCommit": false,
-    "git.suggestSmartCommit": false,
-    "editor.codeActionsOnSave": {
-        "source.fixAll": "always", // or you can use the xo specific code action on save
-        "source.fixAll.xo": "always"
-    },
-    "files.exclude": {
-        "**/out/**": false, // set this to true to hide the "out" folder with the compiled JS files
-        "**/dist/**": false // set this to true to hide the "dist" folder with the compiled JS files
-    },
+    "typescript.tsc.autoDetect": "off",
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "typescript.tsserver.experimental.enableProjectDiagnostics": true,
+    "search.quickOpen.includeHistory": true,
     "search.exclude": {
-        "**/out/**": true, // set this to false to include "out" folder in search results
-        "**/dist/**": true // set this to false to include "dist" folder in search results
+        "/node_modules": true,
+        "/dist": true
     },
-    "editor.formatOnSaveMode": "file", // required to format on save
     "typescript.suggest.paths": true,
     "javascript.suggest.paths": true,
     "terminal.integrated.detectLocale": "on",
     "files.encoding": "utf8",
     "files.eol": "\n",
-    "search.quickOpen.includeHistory": true,
-    "typescript.tsserver.experimental.enableProjectDiagnostics": true,
+    "xo.enable": true,
+    "xo.format.enable": true,
+    "eslint.enable": false,
+    "eslint.format.enable": false,
+    "editor.codeActionsOnSave": {
+        "source.fixAll": "always",
+        "source.fixAll.xo": "always"
+    },
+    "editor.formatOnSave": false,
     "[javascript]": {
         "editor.defaultFormatter": "samverschueren.linter-xo"
     },
