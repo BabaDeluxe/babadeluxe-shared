@@ -1,23 +1,34 @@
 export class BaseError extends Error {
   public readonly namespace: string
+  // Store the original unknown cause
+  private readonly _originalCause?: unknown
 
   constructor(
     message: string,
-    public override readonly cause?: unknown,
+    cause?: unknown,
     public readonly namespaceOverride?: string
   ) {
     const namespace = namespaceOverride ?? new.target.name.replace(/Error$/, '')
-    super(`[${namespace}] ${message}`)
+
+    const errorCause = cause instanceof Error ? cause : undefined
+
+    super(`[${namespace}] ${message}`, { cause: errorCause })
+
     this.name = new.target.name
     this.namespace = namespace
+    this._originalCause = cause
     Object.setPrototypeOf(this, new.target.prototype)
+  }
+
+  public override get cause(): unknown {
+    return this._originalCause
   }
 
   public override toString(): string {
     let output = this.stack ?? `${this.name}: ${this.message}`
 
-    if (this.cause !== undefined) {
-      const causeString = this._formatCause(this.cause)
+    if (this._originalCause !== undefined) {
+      const causeString = this._formatCause(this._originalCause)
       output += `\n\nCaused by:\n${causeString}`
     }
 
@@ -41,7 +52,6 @@ export class BaseError extends Error {
       }
     }
 
-    // Primitives: number, boolean, undefined, null, symbol, bigint
     return typeof cause === 'symbol' ? cause.toString() : String(cause)
   }
 }
