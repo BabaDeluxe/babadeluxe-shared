@@ -1,6 +1,5 @@
 export class BaseError extends Error {
   public readonly namespace: string
-  // Store the original unknown cause
   private readonly _originalCause?: unknown
 
   constructor(
