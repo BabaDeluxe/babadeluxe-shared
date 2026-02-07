@@ -1,6 +1,6 @@
 export class BaseError extends Error {
   public readonly namespace: string
-  private readonly _originalCause?: unknown
+  public readonly originalCause?: unknown
 
   constructor(
     message: string,
@@ -8,26 +8,22 @@ export class BaseError extends Error {
     public readonly namespaceOverride?: string
   ) {
     const namespace = namespaceOverride ?? new.target.name.replace(/Error$/, '')
+    const options = cause instanceof Error ? { cause } : undefined
 
-    const errorCause = cause instanceof Error ? cause : undefined
-
-    super(`[${namespace}] ${message}`, { cause: errorCause })
+    super(`[${namespace}] ${message}`, options)
 
     this.name = new.target.name
     this.namespace = namespace
-    this._originalCause = cause
-    Object.setPrototypeOf(this, new.target.prototype)
-  }
+    this.originalCause = cause
 
-  public override get cause(): unknown {
-    return this._originalCause
+    Object.setPrototypeOf(this, new.target.prototype)
   }
 
   public override toString(): string {
     let output = this.stack ?? `${this.name}: ${this.message}`
 
-    if (this._originalCause !== undefined) {
-      const causeString = this._formatCause(this._originalCause)
+    if (this.originalCause !== undefined) {
+      const causeString = this._formatCause(this.originalCause)
       output += `\n\nCaused by:\n${causeString}`
     }
 
