@@ -66,6 +66,12 @@ export namespace Root {
         "subscription:checkoutSessionError": (p1: {
             error: string;
         }) => void;
+        "models:updated": (p1: {
+            updates: {
+                provider: string;
+                modelId: string;
+            }[];
+        }) => void;
     }
     export interface Actions {
         "settings:getAll": (cb1: (p1: {
@@ -105,10 +111,9 @@ export namespace Root {
             provider: string;
             modelId: string;
             messages: {
-                role: "user" | "assistant" | "system";
+                role: "user" | "assistant";
                 content: string;
             }[];
-            systemPrompt?: string | undefined;
         }, cb2: (p1: {
             success: boolean;
             error?: string | undefined;
