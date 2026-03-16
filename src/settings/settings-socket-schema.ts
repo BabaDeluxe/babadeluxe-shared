@@ -4,7 +4,8 @@
  * Single source of truth for settings validation across frontend and backend.
  *
  * Architecture:
- * - `settingSchemas`: Zod schemas for validation (used by both sides via `validateSetting()`)
+ * - `settingSchema`: Zod object for all settings (per-key schemas via `.shape`)
+ * - `settingSchemas`: Record of per-key Zod schemas (alias of `settingSchema.shape`)
  * - `settingMetadata`: Runtime metadata (category, encryption, dataType)
  * - `UserSettingWithValidation`: TypeScript type for runtime (Date objects)
  * - `userSettingWithValidationSchema`: Zod schema for socket wire format (ISO strings)
@@ -15,18 +16,24 @@
 import { z } from 'zod/v4'
 
 /**
- * Zod validation schemas for individual settings.
+ * Zod validation schema for all settings.
  *
  * Used by:
  * - `validateSetting()` - Validates user input on both frontend and backend
  * - Backend SettingsService - Validates before encryption/storage
  * - Frontend forms - Client-side validation before submission
  */
-export const settingSchemas = {
+export const settingSchema = z.object({
   apiKeyOpenai: z.string().min(23).describe('OpenAI API key for GPT models').optional(),
   apiKeyAnthropic: z.string().min(100).describe('Anthropic API key for Claude models').optional(),
   apiKeyGoogle: z.string().min(35).describe('Google Gemini API key').optional(),
-} as const
+  theme: z.enum(['dark', 'light']).describe('UI theme').optional(),
+})
+
+/**
+ * Record of per-key schemas (for the “map of schemas” philosophy).
+ */
+export const settingSchemas = settingSchema.shape
 
 /**
  * Union type of all valid setting keys.
@@ -40,27 +47,46 @@ type SettingKey = keyof typeof settingSchemas
  * - Backend SettingsService - Determines encryption and defaults
  * - `getSettingDefinition()` - Builds complete setting definition for both sides
  */
-export const settingMetadata = {
+export const settingMetadata: Record<
+  SettingKey,
+  {
+    readonly category: string
+    readonly encrypted: boolean
+    readonly dataType: 'string' | 'number' | 'boolean'
+    readonly required: boolean
+    readonly minLength?: number
+    readonly maxLength?: number
+    readonly minValue?: number
+    readonly maxValue?: number
+  }
+> = {
   apiKeyOpenai: {
     category: 'apiKey',
     encrypted: true,
-    dataType: 'string' as const,
+    dataType: 'string',
     minLength: 23,
     required: false,
   },
   apiKeyAnthropic: {
     category: 'apiKey',
     encrypted: true,
-    dataType: 'string' as const,
+    dataType: 'string',
     minLength: 100,
     required: false,
   },
   apiKeyGoogle: {
     category: 'apiKey',
     encrypted: true,
-    dataType: 'string' as const,
+    dataType: 'string',
     minLength: 35,
     required: false,
+  },
+  theme: {
+    category: 'ui',
+    encrypted: false,
+    dataType: 'string',
+    required: false,
+    // enum already constrains values; no minLength/minValue needed
   },
 } as const
 
@@ -127,11 +153,11 @@ export function getSettingDefinition(
     encrypted: metadata.encrypted,
     dataType: metadata.dataType,
     required: metadata.required,
-    description: schema.description ?? '',
+    description: (schema as { description?: string }).description ?? '',
     minLength: metadata.minLength,
-    maxLength: ('maxLength' in metadata ? metadata.maxLength : undefined) as number | undefined,
-    minValue: ('minValue' in metadata ? metadata.minValue : undefined) as number | undefined,
-    maxValue: ('maxValue' in metadata ? metadata.maxValue : undefined) as number | undefined,
+    maxLength: metadata.maxLength,
+    minValue: metadata.minValue,
+    maxValue: metadata.maxValue,
   }
 }
 
@@ -144,12 +170,17 @@ export function getSettingDefinition(
  */
 export function validateSetting(key: string, value: unknown) {
   const schema = settingSchemas[key as SettingKey]
-  if (!schema) return { success: false as const, error: `Unknown setting: ${key}` }
+  if (!schema) {
+    return { success: false as const, error: `Unknown setting: ${key}` }
+  }
 
   const result = schema.safeParse(value)
   return result.success
     ? { success: true as const, data: result.data }
-    : { success: false as const, error: result.error.issues[0]?.message ?? 'Validation failed' }
+    : {
+        success: false as const,
+        error: result.error.issues[0]?.message ?? 'Validation failed',
+      }
 }
 
 /**
