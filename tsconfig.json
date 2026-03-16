@@ -16,7 +16,6 @@
     "moduleResolution": "bundler"
   },
   "include": [
-    "./src/**/*",
-    "xo.config.ts"
+    "./**/*.ts"
   ],
 }
