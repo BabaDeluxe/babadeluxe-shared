@@ -1,0 +1,38 @@
+<svg width="800" height="200" viewBox="0 0 800 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f051a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1a0b2e;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="200" fill="url(#bg-grad)" />
+
+  <!-- Minimalist Grid/Lines -->
+  <line x1="0" y1="180" x2="800" y2="180" stroke="#4a1d7a" stroke-width="0.5" opacity="0.5" />
+  <line x1="0" y1="185" x2="800" y2="185" stroke="#4a1d7a" stroke-width="0.2" opacity="0.3" />
+  <path d="M 700 0 L 800 100 L 800 0 Z" fill="#6a1b9a" opacity="0.1" />
+
+  <!-- Japanese Text: 共有 (Shared) -->
+  <text x="740" y="60" font-family="sans-serif" font-size="40" fill="#9c27b0" opacity="0.15" font-weight="bold" writing-mode="tb">共有</text>
+
+  <!-- Main Title -->
+  <text x="50%" y="105" dominant-baseline="middle" text-anchor="middle" font-family="monospace, sans-serif" font-size="48" fill="#e1bee7" filter="url(#glow)" font-weight="bold" letter-spacing="2">
+    @babadeluxe/shared
+  </text>
+
+  <!-- Bottom Accent Line -->
+  <rect x="300" y="130" width="200" height="2" fill="#9c27b0" filter="url(#glow)" />
+
+  <!-- Subtle Glitch Elements -->
+  <rect x="50" y="40" width="10" height="1" fill="#ba68c8" opacity="0.4" />
+  <rect x="740" y="160" width="20" height="1" fill="#ba68c8" opacity="0.4" />
+</svg>
