@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="./banner.svg" alt="@babadeluxe/shared banner" width="100%">
+</p>
+
 # @babadeluxe/shared
 
 [![Version](https://img.shields.io/npm/v/@babadeluxe/shared.svg)](https://www.npmjs.com/package/@babadeluxe/shared)
