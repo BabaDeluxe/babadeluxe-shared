@@ -12,6 +12,7 @@
   "files": [
     "./dist",
     "package.json",
+    "LICENSE.md",
     "README.md"
   ],
   "sideEffects": false,
@@ -42,9 +43,9 @@
     "generate-barrels": "barrelsby --config ./.barrelsby.json",
     "build": "unbuild",
     "test-package": "npm pack --dry-run",
-    "publish-patch": "npm run build && npm version patch && npm publish",
-    "publish-minor": "npm run build && npm version minor && npm publish",
-    "publish-major": "npm run build && npm version major && npm publish",
+    "publish-patch": "dotenv -e .env.local && npm run build && npm version patch && npm publish",
+    "publish-minor": "dotenv -e .env.local && npm run build && npm version minor && npm publish",
+    "publish-major": "dotenv -e .env.local && npm run build && npm version major && npm publish",
     "prepare": "husky"
   },
   "dependencies": {
@@ -54,7 +55,7 @@
     "zod-sockets": "^5.0.0"
   },
   "devDependencies": {
-    "@babadeluxe/xo-config": "^0.3.2",
+    "@babadeluxe/xo-config": "^0.4.10",
     "@sindresorhus/tsconfig": "^8.1.0",
     "@typescript-eslint/eslint-plugin": "^8.43.0",
     "@typescript-eslint/parser": "^8.43.0",
@@ -67,5 +68,8 @@
     "typescript": "^5.9.2",
     "unbuild": "^3.6.1",
     "xo": "^1.2.2"
+  },
+  "publishConfig": {
+    "registry": "https://npflared.simonwaiblinger.workers.dev"
   }
 }
