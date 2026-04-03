@@ -1,33 +1,30 @@
-import { execSync } from 'node:child_process'
-import { readFileSync, writeFileSync } from 'node:fs'
-import { resolve } from 'node:path'
+import { chmodSync, existsSync, readFileSync, writeFileSync } from 'node:fs'
+import { homedir } from 'node:os'
+import { join } from 'node:path'
 import process from 'node:process'
 
-const bump = process.argv[2] ?? 'patch'
-
-const npmrcPath = resolve(process.cwd(), '.npmrc')
 const token = process.env['NPM_TOKEN']
-
 if (!token) {
   throw new Error('Missing NPM_TOKEN in .env.local')
 }
 
-const originalNpmrc = readFileSync(npmrcPath, 'utf8')
-const updatedNpmrc = originalNpmrc.replace(/(:_authToken=)(.*)/, `$1${token}`)
+const npmrcPath = join(homedir(), '.npmrc')
+const registryHost = 'npflared.simonwaiblinger.workers.dev'
+const scope = '@babadeluxe'
 
-if (originalNpmrc === updatedNpmrc) {
-  throw new Error('Could not replace auth token in .npmrc')
-}
+const authLine = `//${registryHost}/:_authToken=${token}`
+const scopeLine = `${scope}:registry=https://${registryHost}`
 
-writeFileSync(npmrcPath, updatedNpmrc, 'utf8')
+const existing = existsSync(npmrcPath) ? readFileSync(npmrcPath, 'utf8') : ''
+const lines = existing
+  .split(/\r?\n/)
+  .filter(Boolean)
+  .filter((line) => !line.startsWith(`//${registryHost}/:_authToken=`))
+  .filter((line) => !line.startsWith(`${scope}:registry=`))
 
-try {
-  execSync('npm run build', { stdio: 'inherit' })
-  execSync(`npm version ${bump}`, { stdio: 'inherit' })
-  execSync('npm publish', {
-    stdio: 'inherit',
-    env: process.env,
-  })
-} finally {
-  writeFileSync(npmrcPath, originalNpmrc, 'utf8')
-}
+const next = [...lines, scopeLine, authLine, ''].join('\n')
+
+writeFileSync(npmrcPath, next, 'utf8')
+chmodSync(npmrcPath, 0o600)
+
+console.log(`Wrote auth token for ${scope} to ${npmrcPath}`)
