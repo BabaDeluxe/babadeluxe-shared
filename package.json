@@ -43,9 +43,9 @@
     "generate-barrels": "barrelsby --config ./.barrelsby.json",
     "build": "unbuild",
     "test-package": "npm pack --dry-run",
-    "publish-patch": "npm run build && npm version patch && npm publish",
-    "publish-minor": "npm run build && npm version minor && npm publish",
-    "publish-major": "npm run build && npm version major && npm publish",
+    "publish-patch": "tsx --env-file=./.env ./publish.ts patch",
+    "publish-minor": "tsx --env-file=./.env ./publish.ts minor",
+    "publish-major": "tsx --env-file=./.env ./publish.ts major",
     "prepare": "husky"
   },
   "dependencies": {
