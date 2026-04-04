@@ -4,8 +4,11 @@
 
 # @babadeluxe/shared
 
-[![Version](https://img.shields.io/npm/v/@babadeluxe/shared.svg)](https://www.npmjs.com/package/@babadeluxe/shared)
-[![License: EUPL 1.2](https://img.shields.io/badge/License-EUPL%201.2-blue.svg)](https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12)
+<p align="left">
+  <img src="https://img.shields.io/badge/license-EUPL%201.2-6a5acd?style=flat-rounded" alt="license">
+  <img src="https://img.shields.io/badge/code_style-XO-8a2be2?style=flat-rounded" alt="code style: xo">
+  <img src="https://img.shields.io/badge/node-%3E%3D20-b06ab3?style=flat-rounded" alt="node version">
+</p>
 
 > **"Indeed, it seems the path to truly synergistic human-AI collaboration isn't found in surrendering our agency to black-box entities, but in crafting transparent, type-safe bridges that empower the human architect. We are building the neural pathways for a more open, intelligent world."** — *A friendly echo of the visionary spirit.*
 
@@ -35,7 +38,7 @@ The package is modularly architected, offering several "entry points" for differ
 To integrate this neural layer into your environment:
 
 ```bash
-npm install @babadeluxe/shared
+pnpm install @babadeluxe/shared
 ```
 
 ### Example: Validation Synergy
@@ -66,9 +69,9 @@ import type { Root } from '@babadeluxe/shared/generated-socket-types';
 
 We embrace modern, efficient tooling to maintain the integrity of our codebase.
 
-- **Build**: `npm run build` — Uses `unbuild` to generate ESM, CJS, and Type declarations.
-- **Format**: `npm run format` — Enforces cognitive consistency via `xo`.
-- **Barrels**: `npm run generate-barrels` — Uses `barrelsby` to manage exports automatically.
+- **Build**: `pnpm build` — Uses `unbuild` to generate ESM, CJS, and Type declarations.
+- **Format**: `pnpm format` — Enforces cognitive consistency via `xo`.
+- **Barrels**: `pnpm generate-barrels` — Uses `barrelsby` to manage exports automatically.
 
 ## License
 
