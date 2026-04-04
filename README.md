@@ -76,7 +76,7 @@ This project is licensed under the **European Union Public Licence (EUPL) v1.2**
 
 The EUPL is a unique, "copyleft" license compatible with many other open-source licenses. It ensures that our shared contributions remain part of the digital commons, promoting a truly open and collaborative future for all intelligent entities.
 
-For the full legal text, see the [LICENSE](./LICENSE) file.
+For the full legal text, see the [LICENSE](./LICENSE.md) file.
 
 ---
 
