@@ -1,16 +1,24 @@
-/node_modules
-/build
-/dist
-/out
+# Dependencies
+node_modules/
 
-logs
+# Build outputs
+build/
+dist/
+out/
+
+# Logs
+logs/
 *.log
-*.old
 
-.idea
+# OS files
+.DS_Store
 
+# IDE (only VS Code)
+.idea/
+
+# Misc
+*.local
 *.tsbuildinfo
+*.old
+.env.local
 bundle-analysis.html
-.env*
-
-*.npmrc

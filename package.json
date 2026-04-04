@@ -43,12 +43,14 @@
     "generate-barrels": "barrelsby --config ./.barrelsby.json",
     "build": "unbuild",
     "test-package": "npm pack --dry-run",
-    "publish-patch": "tsx --env-file=./.env ./publish.ts patch",
-    "publish-minor": "tsx --env-file=./.env ./publish.ts minor",
-    "publish-major": "tsx --env-file=./.env ./publish.ts major",
+    "publish-patch": "tsx ./publish.ts patch",
+    "publish-minor": "tsx ./publish.ts minor",
+    "publish-major": "tsx ./publish.ts major",
     "prepare": "husky"
   },
   "dependencies": {
+    "@types/dotenv": "^8.2.3",
+    "dotenv": "^17.4.0",
     "neverthrow": "^8.2.0",
     "socket.io-client": "^4.7.4",
     "zod": "^4.1.12",
