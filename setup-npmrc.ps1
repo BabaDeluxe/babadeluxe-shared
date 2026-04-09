@@ -48,11 +48,11 @@ legacy-peer-deps=true
 '@
 
 # $NPM_REGISTRY_URL must be replaced before $NPM_REGISTRY — it shares the same prefix
-$npmrcContent = $template
-  .Replace('$NPM_REGISTRY_URL',  $npmRegistryUrl)
-  .Replace('$NPM_REGISTRY',      $npmRegistry)
-  .Replace('$NPM_TOKEN',         $npmToken)
-  .Replace('$NPM_PACKAGE_SCOPE', $npmPackageScope)
+$npmrcContent = $template.
+  Replace('$NPM_REGISTRY_URL',  $npmRegistryUrl).
+  Replace('$NPM_REGISTRY',      $npmRegistry).
+  Replace('$NPM_TOKEN',         $npmToken).
+  Replace('$NPM_PACKAGE_SCOPE', $npmPackageScope)
 
 $npmrcPath = Join-Path $WorkspaceRoot '.npmrc'
 Set-Content -Path $npmrcPath -Value $npmrcContent -Encoding UTF8
