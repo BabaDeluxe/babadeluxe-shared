@@ -56,7 +56,6 @@ $template = @'
 # @babadeluxe:registry=https://npflared.simonwaiblinger.workers.dev
 $NPM_PACKAGE_SCOPE:registry=$NPM_REGISTRY_URL
 //$NPM_REGISTRY/:_authToken=$NPM_TOKEN
-//$NPM_REGISTRY/:always-auth=true
 legacy-peer-deps=true
 '@
 
