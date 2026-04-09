@@ -22,3 +22,4 @@ logs/
 *.old
 .env.local
 bundle-analysis.html
+.npmrc
