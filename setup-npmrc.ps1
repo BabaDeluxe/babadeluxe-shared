@@ -5,27 +5,27 @@ param(
 
 # Load .env from workspace root — existing env vars win (non-destructive)
 $envFilePath = Join-Path $WorkspaceRoot '.env'
-if (Test-Path $envFilePath) {
-  Get-Content $envFilePath | ForEach-Object {
-    # Skip blank lines and comments
-    if ($_ -match '^\s*$' -or $_ -match '^\s*#') { return }
-
-    if ($_ -match '^\s*([^=]+?)\s*=\s*(.*?)\s*$') {
-      $key   = $Matches[1]
-      # Strip surrounding quotes from value if present
-      $value = $Matches[2] -replace '^["'']|["'']$'
-
-      if (-not [System.Environment]::GetEnvironmentVariable($key)) {
-        [System.Environment]::SetEnvironmentVariable($key, $value, 'Process')
-      }
-    }
-  }
-
-  Write-Host "✔ .env loaded → $envFilePath"
-} else {
+if (-not (Test-Path $envFilePath)) {
   Write-Host "· No .env found at $envFilePath — relying on shell environment. Exiting..."
   Exit-PSSession
 }
+
+Get-Content $envFilePath | ForEach-Object {
+  # Skip blank lines and comments
+  if ($_ -match '^\s*$' -or $_ -match '^\s*#') { return }
+
+  if ($_ -match '^\s*([^=]+?)\s*=\s*(.*?)\s*$') {
+    $key   = $Matches[1]
+    # Strip surrounding quotes from value if present
+    $value = $Matches[2] -replace '^["'']|["'']$'
+
+    if (-not [System.Environment]::GetEnvironmentVariable($key)) {
+      [System.Environment]::SetEnvironmentVariable($key, $value, 'Process')
+    }
+  }
+}
+
+Write-Host "✔ .env loaded → $envFilePath"
 
 $npmToken = $env:NPM_TOKEN
 $npmPackageScope = $env:NPM_PACKAGE_SCOPE
