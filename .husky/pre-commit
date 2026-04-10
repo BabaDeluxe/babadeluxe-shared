@@ -1,6 +1,9 @@
 #!/bin/sh
 set -e
 
+# Keep git submodules up-to-date
+git submodule update --recursive --init --remote
+
 ORIG_STAGED="$(git diff --cached --name-only)"
 
 npm run generate-barrels || { echo "❌ Barrel generation failed"; exit 1; }

@@ -1,9 +1,0 @@
-#!/bin/sh
-
-# Runs before editor opens
-
-# Restore aborted message if it exists
-if [ -f .git/COMMIT_ABORTED_MSG ]; then
-  cat .git/COMMIT_ABORTED_MSG > "$1"
-  rm .git/COMMIT_ABORTED_MSG
-fi
