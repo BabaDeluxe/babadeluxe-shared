@@ -39,8 +39,8 @@
     }
   },
   "scripts": {
-    "preinstall": "pwsh ./setup-npmrc.ps1",
-    "prepack": "pwsh ./setup-npmrc.ps1",
+    "preinstall": "pnpx tsx ./setup-npmrc.ts1",
+    "prepack": "pnpx tsx ./setup-npmrc.ts",
     "format": "xo --fix --prettier",
     "generate-barrels": "barrelsby --config ./.barrelsby.json",
     "build": "unbuild",
