@@ -39,7 +39,7 @@
     }
   },
   "scripts": {
-    "preinstall": "pnpx tsx ./setup-npmrc.ts1",
+    "pnpm:devPreinstall": "pnpx tsx ./setup-npmrc.ts",
     "prepack": "pnpx tsx ./setup-npmrc.ts",
     "format": "xo --fix --prettier",
     "generate-barrels": "barrelsby --config ./.barrelsby.json",

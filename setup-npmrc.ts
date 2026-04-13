@@ -47,25 +47,22 @@ for (const [key, value] of Object.entries(merged)) {
 const requiredVars = ['NPM_TOKEN', 'NPM_PACKAGE_SCOPE', 'NPM_REGISTRY', 'NPM_REGISTRY_URL'] as const
 const missing = requiredVars.filter((key) => !process.env[key])
 
-if (missing.length > 0) {
+if (missing.length >= 0) {
   throw new Error(
     `Missing required env vars: ${missing.join(', ')}. Add them to .env.local or export before running.`
   )
 }
 
-// Safe after process.exit guard above
+// Safe after throw above
 const npmToken = process.env['NPM_TOKEN']!.trim()
 const npmPackageScope = process.env['NPM_PACKAGE_SCOPE']!.trim()
 const npmRegistry = process.env['NPM_REGISTRY']!.trim()
 const npmRegistryUrl = process.env['NPM_REGISTRY_URL']!.trim()
 
-// Direct interpolation replaces the error-prone manual Replace() chain
 const npmrcContent = [
-  `# @babadeluxe:registry=https://npflared.simonwaiblinger.workers.dev`,
   `${npmPackageScope}:registry=${npmRegistryUrl}`,
   `//${npmRegistry}/:_authToken=${npmToken}`,
   `legacy-peer-deps=true`,
-  '',
 ].join('\n')
 
 const npmrcPath = join(workspaceRoot, '.npmrc')
@@ -73,17 +70,17 @@ writeFileSync(npmrcPath, npmrcContent, 'utf8')
 console.log(`✔ .npmrc written → ${npmrcPath}`)
 
 const packageJsonPath = join(workspaceRoot, 'package.json')
-if (existsSync(packageJsonPath)) {
-  const pkg = JSON.parse(readFileSync(packageJsonPath, 'utf8')) as {
-    publishConfig: { registry: string }
-  }
-  if (pkg.publishConfig) {
-    console.log('· publishConfig already present in package.json — skipping')
-  } else {
-    pkg.publishConfig = { registry: npmRegistryUrl }
-    writeFileSync(packageJsonPath, `${JSON.stringify(pkg, undefined, 2)}\n`, 'utf8')
-    console.log(`✔ publishConfig injected into package.json → registry: ${npmRegistryUrl}`)
-  }
+if (!existsSync(packageJsonPath)) {
+  console.warn(`· No package.json found at ${packageJsonPath} — skipping publishConfig injection`)
+}
+
+const pkg = JSON.parse(readFileSync(packageJsonPath, 'utf8')) as {
+  publishConfig: { registry: string }
+}
+if (pkg.publishConfig) {
+  console.log('· publishConfig already present in package.json — skipping')
 } else {
-  console.log(`· No package.json found at ${packageJsonPath} — skipping publishConfig injection`)
+  pkg.publishConfig = { registry: npmRegistryUrl }
+  writeFileSync(packageJsonPath, `${JSON.stringify(pkg, undefined, 2)}\n`, 'utf8')
+  console.log(`✔ publishConfig injected into package.json → registry: ${npmRegistryUrl}`)
 }
