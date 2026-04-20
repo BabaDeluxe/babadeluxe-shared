@@ -1,24 +1,32 @@
-#!/bin/sh
-set -e
+#!/bin/bash
+set -euo pipefail
 
-# Keep git submodules up-to-date
-git submodule update --recursive --init --remote
+staged_list="$(mktemp)"
+trap 'rm -f "$staged_list"' EXIT
 
-ORIG_STAGED="$(git diff --cached --name-only)"
+# Capture staged file paths as null-delimited stream to handle spaces in filenames
+git diff --cached --name-only --diff-filter=ACM -z > "$staged_list"
 
-npm run generate-barrels || { echo "❌ Barrel generation failed"; exit 1; }
-npm run format
-
-# Re-stage originally staged files that still exist
-if [ -n "$ORIG_STAGED" ]; then
-  echo "$ORIG_STAGED" | while IFS= read -r file; do
-    if [ -f "$file" ]; then
-      git add "$file"
-    fi
-  done
+if [[ ! -s "$staged_list" ]]; then
+  echo "[pre-commit] no staged files found, skipping"
+  exit 0
 fi
 
-# Add ALL barrel files (new AND modified)
+echo "[pre-commit] running barrel generation..."
+pnpm run generate-barrels || { echo "[pre-commit] ABORT: barrel generation failed"; exit 1; }
+echo "[pre-commit] barrel generation passed"
+
+echo "[pre-commit] running format..."
+pnpm format || { echo "[pre-commit] ABORT: format failed"; exit 1; }
+echo "[pre-commit] format passed"
+
+# Re-stage originally staged files — guard against files deleted during auto-fix
+echo "[pre-commit] re-staging auto-fixed files..."
+while IFS= read -r -d '' file; do
+  [[ -f "$file" ]] && git add "$file"
+done < "$staged_list"
+
+# Stage all barrel files (new and modified)
 find src -name "index.ts" -type f -exec git add {} +
 
-exit 0
+echo "[pre-commit] all checks passed"
