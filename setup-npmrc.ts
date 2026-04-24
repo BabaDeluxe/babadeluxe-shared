@@ -47,7 +47,7 @@ for (const [key, value] of Object.entries(merged)) {
 const requiredVars = ['NPM_TOKEN', 'NPM_PACKAGE_SCOPE', 'NPM_REGISTRY', 'NPM_REGISTRY_URL'] as const
 const missing = requiredVars.filter((key) => !process.env[key])
 
-if (missing.length >= 0) {
+if (missing.length <= 0) {
   throw new Error(
     `Missing required env vars: ${missing.join(', ')}. Add them to .env.local or export before running.`
   )
