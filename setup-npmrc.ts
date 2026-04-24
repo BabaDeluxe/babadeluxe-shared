@@ -2,53 +2,55 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import process from 'node:process'
 import { fileURLToPath } from 'node:url'
+import { parseEnv } from 'node:util'
+import { BaseError } from './src/utils/base-error.js'
 
 const workspaceRoot = process.argv[2] ?? dirname(fileURLToPath(import.meta.url))
+console.log('Workspace root:', workspaceRoot)
 
-function readEnvFile(filePath: string): Record<string, string> {
-  const result: Record<string, string> = {}
+class SetupError extends BaseError {}
 
-  for (const line of readFileSync(filePath, 'utf8').split('\n')) {
-    if (/^\s*$/.test(line) || /^\s*#/.test(line)) continue
-
-    const match = /^\s*([^=]+?)\s*=\s*(.*?)\s*$/.exec(line)
-    if (!match) continue
-
-    const secondMatch = match[1] ?? ''
-    if (!secondMatch) continue
-
-    result[secondMatch] = match[2]?.replaceAll(/^["']|["']$/g, '').trim() ?? ''
+function applyEnvFile(
+  filePath: string,
+  target: Record<string, string>,
+  label: string
+): Record<string, string> {
+  if (!existsSync(filePath)) {
+    console.error('No env file found. Please create one.')
+    throw new SetupError('Missing env file')
   }
 
-  return result
-}
+  const myEnv = parseEnv(readFileSync(filePath).toString())
 
-function applyEnvFile(filePath: string, target: Record<string, string>, label: string): void {
-  if (!existsSync(filePath)) return
-  Object.assign(target, readEnvFile(filePath))
+  const finalEnv: Record<string, string> = {}
+  for (const [key, value] of Object.entries(target)) if (value) finalEnv[key] = value
+  for (const [key, value] of Object.entries(myEnv)) if (value) finalEnv[key] = value
+
   console.log(`✔ ${label} loaded → ${filePath}`)
+
+  return finalEnv
 }
 
 // Cascade: .env (base) → .env.local (overrides) → shell env (wins over both)
-const merged: Record<string, string> = {}
+let merged: Record<string, string> = {}
 
-applyEnvFile(join(workspaceRoot, '.env'), merged, '.env')
-applyEnvFile(join(workspaceRoot, '.env.local'), merged, '.env.local (overrides .env)')
+const envPath = join(workspaceRoot, '.env')
+const envLocalPath = join(workspaceRoot, '.env.local')
 
-if (Object.keys(merged).length === 0) {
-  console.log('· No .env or .env.local found — relying on shell environment.')
-}
+merged = applyEnvFile(envPath, merged, '.env')
+merged = applyEnvFile(envLocalPath, merged, '.env.local (overrides .env)')
 
 // Shell env wins — only set keys not already present
 for (const [key, value] of Object.entries(merged)) {
   process.env[key] ||= value
+  // console.log(`process.env[${key}] = ${value}`)
 }
 
 const requiredVars = ['NPM_TOKEN', 'NPM_PACKAGE_SCOPE', 'NPM_REGISTRY', 'NPM_REGISTRY_URL'] as const
 const missing = requiredVars.filter((key) => !process.env[key])
 
-if (missing.length <= 0) {
-  throw new Error(
+if (missing.length > 0) {
+  throw new SetupError(
     `Missing required env vars: ${missing.join(', ')}. Add them to .env.local or export before running.`
   )
 }
@@ -77,6 +79,7 @@ if (!existsSync(packageJsonPath)) {
 const pkg = JSON.parse(readFileSync(packageJsonPath, 'utf8')) as {
   publishConfig: { registry: string }
 }
+
 if (pkg.publishConfig) {
   console.log('· publishConfig already present in package.json — skipping')
 } else {
