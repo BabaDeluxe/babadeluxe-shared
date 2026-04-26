@@ -3,8 +3,10 @@ src/
 .git/
 .vscode/
 .husky/
+
 *.log
 *.old
+
 .barrelsby.json
 .editorconfig
 .gitattributes
@@ -12,8 +14,10 @@ src/
 .npmignore
 .npmrc
 .prettierrc
-.env*
+
+.env
+.env.example
+.env.local
+
 tsconfig.json
-example.npmrc
-package-lock.json
 xo[.-]config.ts
