@@ -78,7 +78,7 @@
     "tsx": "^4.20.5",
     "typescript": "^5.9.2",
     "unbuild": "^3.6.1",
-    "xo": "^1.2.2"
+    "xo": "1.2.2"
   },
   "publishConfig": {
     "registry": "https://npflared.simonwaiblinger.workers.dev"
