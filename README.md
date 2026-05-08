@@ -10,77 +10,63 @@
   <img src="https://img.shields.io/badge/node-%3E%3D20-b06ab3?style=flat-rounded" alt="node version">
 </p>
 
-> **"Indeed, it seems the path to truly synergistic human-AI collaboration isn't found in surrendering our agency to black-box entities, but in crafting transparent, type-safe bridges that empower the human architect. We are building the neural pathways for a more open, intelligent world."** — *A friendly echo of the visionary spirit.*
+> **Shared types, Zod schemas, and utilities used across the BabaDeluxe ecosystem.** If it needs to be consistent between the extension, webview, and backend — it lives here.
 
-`@babadeluxe/shared` serves as the foundational neural substrate for the BabaDeluxe ecosystem. It provides the essential types, schemas, and utilities that allow our AI coding assistant to communicate with mathematical precision, ensuring that you—the developer—remain the sovereign conductor of your creative process.
+## Overview
 
-## Why @babadeluxe/shared?
+This package is the single source of truth for cross-cutting concerns in BabaDeluxe. It provides end-to-end type safety between the VS Code extension, the Vue webview, and the backend — no duplicated type definitions, no schema drift.
 
-In our quest for beneficial intelligence and robust software, we must move beyond the "blind" autonomous agents that often clutter our codebases. BabaDeluxe favors high-bandwidth, type-safe interaction.
+## Entry Points
 
-This shared library solves several key challenges in the synergistic AI-human workflow:
+| Import | Contents |
+| :--- | :--- |
+| `@babadeluxe/shared` | Main entry point — re-exports all sub-modules |
+| `@babadeluxe/shared/generated-socket-types` | Auto-generated Zod-based Socket.io event definitions |
+| `@babadeluxe/shared/settings` | User configuration schema, validation, and metadata |
+| `@babadeluxe/shared/utils` | General utilities: Damerau-Levenshtein distance, safe JSON parsing |
 
-- **Semantic Integrity**: End-to-end type safety between frontend and backend via `zod-sockets`.
-- **Cognitive Clarity**: A robust, schema-driven approach to configuration and settings.
-- **Logical Reusability**: Unified utilities that ensure the same "mental model" is applied across the entire system.
-
-## What's inside?
-
-The package is modularly architected, offering several "entry points" for different cognitive tasks:
-
-- **`@babadeluxe/shared`**: The main entry point, aggregating all sub-modules.
-- **`@babadeluxe/shared/generated-socket-types`**: Automatically generated Zod-based socket definitions for flawless communication.
-- **`@babadeluxe/shared/settings`**: The "source of truth" for user configuration, including validation and metadata.
-- **`@babadeluxe/shared/utils`**: General-purpose logic like Damerau-Levenshtein distance and safe JSON parsing.
-
-## Getting Started
-
-To integrate this neural layer into your environment:
+## Installation
 
 ```bash
 pnpm install @babadeluxe/shared
 ```
 
-### Example: Validation Synergy
+## Usage
+
+### Settings validation
 
 ```typescript
-import { validateSetting } from '@babadeluxe/shared/settings';
+import { validateSetting } from '@babadeluxe/shared/settings'
 
-// Validate a user setting with the core schema
-const result = validateSetting('my-cool-setting', 'some-value');
-
+const result = validateSetting('theme', 'dark')
 if (result.success) {
-  console.log('Synchronized with the vision:', result.data);
+  console.log(result.data)
 } else {
-  console.error('Cognitive dissonance detected:', result.error);
+  console.error(result.error)
 }
 ```
 
-### Example: Type-Safe Communication
+### Type-safe socket events
 
 ```typescript
-import type { Root } from '@babadeluxe/shared/generated-socket-types';
+import type { Root } from '@babadeluxe/shared/generated-socket-types'
 
-// Use Root.Socket to type your socket.io-client instance for strict interaction
-// socket: Root.Socket = io(Root.path);
+// Type your socket.io-client instance for strict event handling
+// const socket: Root.Socket = io(Root.path)
 ```
 
 ## Development
 
-We embrace modern, efficient tooling to maintain the integrity of our codebase.
-
-- **Build**: `pnpm build` — Uses `unbuild` to generate ESM, CJS, and Type declarations.
-- **Format**: `pnpm format` — Enforces cognitive consistency via `xo`.
-- **Barrels**: `pnpm generate-barrels` — Uses `barrelsby` to manage exports automatically.
+| Script | Description |
+| :--- | :--- |
+| `pnpm build` | Produces ESM, CJS, and `.d.ts` declarations via `unbuild` |
+| `pnpm format` | Lints and formats with XO + Prettier |
+| `pnpm generate-barrels` | Regenerates barrel exports via `barrelsby` |
 
 ## License
 
-This project is licensed under the **European Union Public Licence (EUPL) v1.2**.
-
-The EUPL is a unique, "copyleft" license compatible with many other open-source licenses. It ensures that our shared contributions remain part of the digital commons, promoting a truly open and collaborative future for all intelligent entities.
-
-For the full legal text, see the [LICENSE](./LICENSE.md) file.
+This project is licensed under the **European Union Public License 1.2 (EUPL-1.2)**. See [LICENSE](./LICENSE.md) for the full text.
 
 ---
 
-*Onward to a more intelligent, collaborative future.*
+**BabaDeluxe** — _Redefining the Future of Software Development._
