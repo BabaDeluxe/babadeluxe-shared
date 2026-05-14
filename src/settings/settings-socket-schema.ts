@@ -28,10 +28,29 @@ export const settingSchema = z.object({
   apiKeyAnthropic: z.string().min(100).describe('Anthropic API key for Claude models').optional(),
   apiKeyGoogle: z.string().min(35).describe('Google Gemini API key').optional(),
   theme: z.enum(['dark', 'light']).describe('UI theme').optional(),
+
+  /**
+   * Per-model temperature overrides stored as a JSON object.
+   *
+   * Keys are model value strings (e.g. `"gpt-4o"`, `"claude-sonnet-4-5"`).
+   * Values are floats in the range [0, 2].
+   *
+   * Example:
+   * ```json
+   * { "gpt-4o": 0.7, "claude-sonnet-4-5": 0.3 }
+   * ```
+   *
+   * Stored as a JSON string on the wire; parsed on read.
+   * When a model key is absent the provider default (usually 1.0) is used.
+   */
+  modelTemperatures: z
+    .record(z.string(), z.number().min(0).max(2))
+    .describe('Per-model temperature overrides (model value → 0–2 float)')
+    .optional(),
 })
 
 /**
- * Record of per-key schemas (for the “map of schemas” philosophy).
+ * Record of per-key schemas (for the "map of schemas" philosophy).
  */
 export const settingSchemas = settingSchema.shape
 
@@ -86,7 +105,12 @@ export const settingMetadata: Record<
     encrypted: false,
     dataType: 'string',
     required: false,
-    // enum already constrains values; no minLength/minValue needed
+  },
+  modelTemperatures: {
+    category: 'model',
+    encrypted: false,
+    dataType: 'string', // serialised JSON object on the wire
+    required: false,
   },
 } as const
 
@@ -188,4 +212,49 @@ export function validateSetting(key: string, value: unknown) {
  */
 export type UserSettingWire = Omit<UserSettingWithValidation, 'updatedAt'> & {
   readonly updatedAt: string
+}
+
+// ─── Model temperature helpers ────────────────────────────────────────────────
+
+/** Shape of the modelTemperatures setting value. */
+export type ModelTemperatures = Record<string, number>
+
+/** Provider default temperature used when no override exists. */
+export const DEFAULT_TEMPERATURE = 1.0
+
+/**
+ * Get the temperature for a specific model, falling back to the provider default.
+ *
+ * @example
+ * const temp = getModelTemperature({ 'gpt-4o': 0.7 }, 'claude-sonnet-4-5') // 1.0
+ * const temp2 = getModelTemperature({ 'gpt-4o': 0.7 }, 'gpt-4o')           // 0.7
+ */
+export function getModelTemperature(
+  temperatures: ModelTemperatures | undefined,
+  modelValue: string
+): number {
+  return temperatures?.[modelValue] ?? DEFAULT_TEMPERATURE
+}
+
+/**
+ * Set the temperature for a specific model, returning a new object (immutable).
+ */
+export function setModelTemperature(
+  temperatures: ModelTemperatures | undefined,
+  modelValue: string,
+  value: number
+): ModelTemperatures {
+  return { ...(temperatures ?? {}), [modelValue]: value }
+}
+
+/**
+ * Remove the temperature override for a specific model (reset to default).
+ */
+export function resetModelTemperature(
+  temperatures: ModelTemperatures | undefined,
+  modelValue: string
+): ModelTemperatures {
+  const next = { ...(temperatures ?? {}) }
+  delete next[modelValue]
+  return next
 }
