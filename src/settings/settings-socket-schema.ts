@@ -30,6 +30,54 @@ export const settingSchema = z.object({
   theme: z.enum(['dark', 'light']).describe('UI theme').optional(),
 
   /**
+   * Determines when the system prompt is appended during a conversation.
+   *
+   * - `always`            – Prepend the prompt to every message sent.
+   * - `first-message`     – Inject once at the start of each new conversation.
+   * - `every-x-messages`  – Re-inject after every N messages (see `promptInjectionInterval`).
+   * - `on-prompt-change`  – Re-inject automatically when the active prompt is switched.
+   * - `manual`            – Never auto-inject; user triggers it explicitly.
+   */
+  promptInjectionMode: z
+    .enum(['always', 'first-message', 'every-x-messages', 'on-prompt-change', 'manual'])
+    .describe('When to append the system prompt during a conversation')
+    .optional(),
+
+  /**
+   * Number of messages between automatic re-injections.
+   * Only used when `promptInjectionMode` is `every-x-messages`.
+   * Range: 1–20.
+   */
+  promptInjectionInterval: z
+    .number()
+    .int()
+    .min(1)
+    .max(20)
+    .describe('Message interval for every-x-messages injection mode')
+    .optional(),
+
+  /**
+   * Where the prompt is injected in the message array.
+   *
+   * - `system`      – Sent as a dedicated `role: "system"` message.
+   * - `user-prefix` – Prepended inline to the first user message.
+   * - `user-suffix` – Appended inline to the last user message before send.
+   */
+  promptInjectionPosition: z
+    .enum(['system', 'user-prefix', 'user-suffix'])
+    .describe('Where to inject the prompt relative to the message array')
+    .optional(),
+
+  /**
+   * Whether to re-include prior conversation history when re-injecting the prompt
+   * mid-conversation (relevant for `every-x-messages` and `on-prompt-change` modes).
+   */
+  promptIncludeHistory: z
+    .boolean()
+    .describe('Re-include conversation history when re-injecting the prompt')
+    .optional(),
+
+  /**
    * Per-model temperature overrides stored as a JSON object.
    *
    * Keys are model value strings (e.g. `"gpt-4o"`, `"claude-sonnet-4-5"`).
@@ -104,6 +152,32 @@ export const settingMetadata: Record<
     category: 'ui',
     encrypted: false,
     dataType: 'string',
+    required: false,
+  },
+  promptInjectionMode: {
+    category: 'prompt',
+    encrypted: false,
+    dataType: 'string',
+    required: false,
+  },
+  promptInjectionInterval: {
+    category: 'prompt',
+    encrypted: false,
+    dataType: 'number',
+    required: false,
+    minValue: 1,
+    maxValue: 20,
+  },
+  promptInjectionPosition: {
+    category: 'prompt',
+    encrypted: false,
+    dataType: 'string',
+    required: false,
+  },
+  promptIncludeHistory: {
+    category: 'prompt',
+    encrypted: false,
+    dataType: 'boolean',
     required: false,
   },
   modelTemperatures: {
@@ -213,6 +287,22 @@ export function validateSetting(key: string, value: unknown) {
 export type UserSettingWire = Omit<UserSettingWithValidation, 'updatedAt'> & {
   readonly updatedAt: string
 }
+
+// ─── Prompt injection helpers ────────────────────────────────────────────────
+
+/** Typed alias for all valid injection modes. */
+export type PromptInjectionMode = z.infer<typeof settingSchema.shape.promptInjectionMode>
+
+/** Typed alias for all valid injection positions. */
+export type PromptInjectionPosition = z.infer<typeof settingSchema.shape.promptInjectionPosition>
+
+/** Default values used when a setting is absent. */
+export const PROMPT_INJECTION_DEFAULTS = {
+  mode: 'always' as NonNullable<PromptInjectionMode>,
+  interval: 5,
+  position: 'system' as NonNullable<PromptInjectionPosition>,
+  includeHistory: true,
+} as const
 
 // ─── Model temperature helpers ────────────────────────────────────────────────
 
