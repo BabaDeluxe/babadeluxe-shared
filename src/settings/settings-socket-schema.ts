@@ -272,7 +272,7 @@ export type PromptInjectionMode = z.infer<typeof settingSchema.shape.promptInjec
 export type PromptInjectionPosition = z.infer<typeof settingSchema.shape.promptInjectionPosition>
 
 /** Default values used when a setting is absent. */
-export const PROMPT_INJECTION_DEFAULTS = {
+export const promptInjectionDefaults = {
   mode: 'always' as NonNullable<PromptInjectionMode>,
   interval: 5,
   position: 'system' as NonNullable<PromptInjectionPosition>,

@@ -1,7 +1,6 @@
-import { type FlatXoConfig, type XoConfigItem } from 'xo'
-import sharedConfig from '@babadeluxe/xo-config'
+import type { FlatXoConfig } from 'xo'
+import baseConfig from '@babadeluxe/xo-config'
 
-const baseConfig = sharedConfig as XoConfigItem | XoConfigItem[]
 const configArray = Array.isArray(baseConfig) ? baseConfig : [baseConfig]
 
 const config: FlatXoConfig = [
