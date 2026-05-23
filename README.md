@@ -55,6 +55,35 @@ import type { Root } from '@babadeluxe/shared/generated-socket-types'
 // const socket: Root.Socket = io(Root.path)
 ```
 
+### Safe JSON Parsing
+
+```typescript
+import { safeJsonParse } from '@babadeluxe/shared/utils'
+
+const result = safeJsonParse('{"foo": "bar"}')
+
+if (result.isOk()) {
+  console.log(result.value) // Typed as Record<string, unknown>
+} else {
+  console.error(result.error.message) // BaseError instance
+}
+```
+
+## Contributor Setup
+
+This package uses a custom npm registry. To set up your local development environment:
+
+1.  **Copy the environment template:**
+    ```bash
+    cp .env.local.example .env.local
+    ```
+2.  **Fill in your credentials** in `.env.local`. You will need a valid `NPM_TOKEN`.
+3.  **Install dependencies:**
+    ```bash
+    pnpm install
+    ```
+    The `pnpm:devPreinstall` hook will automatically run `setup-npmrc.ts` to generate your local `.npmrc` and configure `publishConfig` in `package.json`.
+
 ## Development
 
 | Script | Description |
@@ -62,6 +91,10 @@ import type { Root } from '@babadeluxe/shared/generated-socket-types'
 | `pnpm build` | Produces ESM, CJS, and `.d.ts` declarations via `unbuild` |
 | `pnpm format` | Lints and formats with XO + Prettier |
 | `pnpm generate-barrels` | Regenerates barrel exports via `barrelsby` |
+| `pnpm test-package` | Builds and performs a dry-run pack to verify integrity |
+| `pnpm publish-patch` | Bumps version (patch) and publishes to the custom registry |
+| `pnpm publish-minor` | Bumps version (minor) and publishes to the custom registry |
+| `pnpm publish-major` | Bumps version (major) and publishes to the custom registry |
 
 ## License
 
