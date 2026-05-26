@@ -13,11 +13,17 @@ class SetupError extends BaseError {}
 function applyEnvFile(
   filePath: string,
   target: Record<string, string>,
-  label: string
+  label: string,
+  required = true
 ): Record<string, string> {
   if (!existsSync(filePath)) {
-    console.error('No env file found. Please create one.')
-    throw new SetupError('Missing env file')
+    if (required) {
+      console.error('No env file found. Please create one.')
+      throw new SetupError('Missing env file')
+    }
+
+    console.warn(`· ${label} not found at ${filePath} — skipping (optional)`)
+    return target
   }
 
   const myEnv = parseEnv(readFileSync(filePath).toString())
@@ -38,7 +44,7 @@ const envPath = join(workspaceRoot, '.env')
 const envLocalPath = join(workspaceRoot, '.env.local')
 
 merged = applyEnvFile(envPath, merged, '.env')
-merged = applyEnvFile(envLocalPath, merged, '.env.local (overrides .env)')
+merged = applyEnvFile(envLocalPath, merged, '.env.local (overrides .env)', false)
 
 // Shell env wins — only set keys not already present
 for (const [key, value] of Object.entries(merged)) {
