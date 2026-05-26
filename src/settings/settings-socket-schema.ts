@@ -310,7 +310,7 @@ export const promptInjectionDefaults = {
 export type ModelTemperatures = Record<string, number>
 
 /** Provider default temperature used when no override exists. */
-export const DEFAULT_TEMPERATURE = 1.0
+export const defaultTemperature = 1.0
 
 /**
  * Get the temperature for a specific model, falling back to the provider default.
@@ -323,7 +323,7 @@ export function getModelTemperature(
   temperatures: ModelTemperatures | undefined,
   modelValue: string
 ): number {
-  return temperatures?.[modelValue] ?? DEFAULT_TEMPERATURE
+  return temperatures?.[modelValue] ?? defaultTemperature
 }
 
 /**
