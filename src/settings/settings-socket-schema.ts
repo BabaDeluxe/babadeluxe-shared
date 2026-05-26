@@ -76,6 +76,25 @@ export const settingSchema = z.object({
     .boolean()
     .describe('Re-include conversation history when re-injecting the prompt')
     .optional(),
+
+  /**
+   * Per-model temperature overrides stored as a JSON object.
+   *
+   * Keys are model value strings (e.g. `"gpt-4o"`, `"claude-sonnet-4-5"`).
+   * Values are floats in the range [0, 2].
+   *
+   * Example:
+   * ```json
+   * { "gpt-4o": 0.7, "claude-sonnet-4-5": 0.3 }
+   * ```
+   *
+   * Stored as a JSON string on the wire; parsed on read.
+   * When a model key is absent the provider default (usually 1.0) is used.
+   */
+  modelTemperatures: z
+    .record(z.string(), z.number().min(0).max(2))
+    .describe('Per-model temperature overrides (model value → 0–2 float)')
+    .optional(),
 })
 
 /**
@@ -159,6 +178,12 @@ export const settingMetadata: Record<
     category: 'prompt',
     encrypted: false,
     dataType: 'boolean',
+    required: false,
+  },
+  modelTemperatures: {
+    category: 'model',
+    encrypted: false,
+    dataType: 'string', // serialised JSON object on the wire
     required: false,
   },
 } as const
@@ -278,3 +303,48 @@ export const promptInjectionDefaults = {
   position: 'system' as NonNullable<PromptInjectionPosition>,
   includeHistory: true,
 } as const
+
+// ─── Model temperature helpers ────────────────────────────────────────────────
+
+/** Shape of the modelTemperatures setting value. */
+export type ModelTemperatures = Record<string, number>
+
+/** Provider default temperature used when no override exists. */
+export const defaultTemperature = 1.0
+
+/**
+ * Get the temperature for a specific model, falling back to the provider default.
+ *
+ * @example
+ * const temp = getModelTemperature({ 'gpt-4o': 0.7 }, 'claude-sonnet-4-5') // 1.0
+ * const temp2 = getModelTemperature({ 'gpt-4o': 0.7 }, 'gpt-4o')           // 0.7
+ */
+export function getModelTemperature(
+  temperatures: ModelTemperatures | undefined,
+  modelValue: string
+): number {
+  return temperatures?.[modelValue] ?? defaultTemperature
+}
+
+/**
+ * Set the temperature for a specific model, returning a new object (immutable).
+ */
+export function setModelTemperature(
+  temperatures: ModelTemperatures | undefined,
+  modelValue: string,
+  value: number
+): ModelTemperatures {
+  return { ...(temperatures ?? {}), [modelValue]: value }
+}
+
+/**
+ * Remove the temperature override for a specific model (reset to default).
+ */
+export function resetModelTemperature(
+  temperatures: ModelTemperatures | undefined,
+  modelValue: string
+): ModelTemperatures {
+  const next = { ...(temperatures ?? {}) }
+  delete next[modelValue]
+  return next
+}
