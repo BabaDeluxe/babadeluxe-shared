@@ -2,5 +2,8 @@ allowBuilds:
   esbuild: true
   unrs-resolver: true
 
+
 packages:
   - "*"
+
+ignoreWorkspaceRootCheck: true
