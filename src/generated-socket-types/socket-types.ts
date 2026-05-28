@@ -75,7 +75,7 @@ export namespace Root {
     }
     export interface Actions {
         "settings:getAll": (cb1: (p1: {
-            success: boolean;
+            success: true;
             data: {
                 settingKey: string;
                 settingValue: unknown;
@@ -90,21 +90,41 @@ export namespace Root {
                 category: string;
                 encrypted: boolean;
             }[];
-            error?: string | undefined;
+        } | {
+            success: false;
+            data: {
+                settingKey: string;
+                settingValue: unknown;
+                dataType: "string" | "number" | "boolean";
+                updatedAt: string;
+                required: boolean;
+                minLength?: number | undefined;
+                maxLength?: number | undefined;
+                minValue?: number | undefined;
+                maxValue?: number | undefined;
+                description: string;
+                category: string;
+                encrypted: boolean;
+            }[];
+            error: string;
         }) => void) => void;
         "settings:upsert": (p1: {
             settingKey: string;
             settingValue: unknown;
             dataType: "string" | "number" | "boolean";
         }, cb2: (p1: {
-            success: boolean;
-            error?: string | undefined;
+            success: true;
+        } | {
+            success: false;
+            error: string;
         }) => void) => void;
         "settings:delete": (p1: {
             settingKey: string;
         }, cb2: (p1: {
-            success: boolean;
-            error?: string | undefined;
+            success: true;
+        } | {
+            success: false;
+            error: string;
         }) => void) => void;
         "chat:sendMessage": (p1: {
             messageId: number;
@@ -126,8 +146,8 @@ export namespace Root {
             error?: string | undefined;
         }) => void) => void;
         "models:listAllModels": (cb1: (p1: {
-            success: boolean;
-            models?: {
+            success: true;
+            models: {
                 openai: {
                     modelId: string;
                     contextWindow?: number | undefined;
@@ -143,8 +163,10 @@ export namespace Root {
                     contextWindow?: number | undefined;
                     source?: ("litellm" | "discovered") | undefined;
                 }[];
-            } | undefined;
-            error?: string | undefined;
+            };
+        } | {
+            success: false;
+            error: string;
         }) => void) => void;
         "validation:validateApiKey": (p1: {
             provider: "openai" | "anthropic" | "google";
@@ -175,7 +197,7 @@ export namespace Root {
             provider: string;
         }) => void) => void;
         "prompts:getPrompts": (cb1: (p1: {
-            success: boolean;
+            success: true;
             data: {
                 id: number;
                 name: string;
@@ -187,7 +209,20 @@ export namespace Root {
                 createdAt: string;
                 updatedAt: string;
             }[];
-            error?: string | undefined;
+        } | {
+            success: false;
+            data: {
+                id: number;
+                name: string;
+                command?: string | undefined;
+                template: string;
+                description?: string | undefined;
+                isActive: boolean;
+                isSystem: boolean;
+                createdAt: string;
+                updatedAt: string;
+            }[];
+            error: string;
         }) => void) => void;
         "prompts:createPrompt": (p1: {
             name: string;
@@ -195,8 +230,10 @@ export namespace Root {
             template: string;
             description?: string | undefined;
         }, cb2: (p1: {
-            success: boolean;
-            error?: string | undefined;
+            success: true;
+        } | {
+            success: false;
+            error: string;
         }) => void) => void;
         "prompts:updatePrompt": (p1: {
             id: number;
@@ -206,21 +243,27 @@ export namespace Root {
             description?: string | undefined;
             isActive?: boolean | undefined;
         }, cb2: (p1: {
-            success: boolean;
-            error?: string | undefined;
+            success: true;
+        } | {
+            success: false;
+            error: string;
         }) => void) => void;
         "prompts:deletePrompt": (p1: {
             id: number;
         }, cb2: (p1: {
-            success: boolean;
-            error?: string | undefined;
+            success: true;
+        } | {
+            success: false;
+            error: string;
         }) => void) => void;
         "prompts:getPrompt": (p1: {
             command: string;
         }, cb2: (p1: {
-            success: boolean;
-            template?: string | undefined;
-            error?: string | undefined;
+            success: true;
+            template: string;
+        } | {
+            success: false;
+            error: string;
         }) => void) => void;
         "subscription:createCheckoutSession": (cb1: (p1: {
             success: boolean;
