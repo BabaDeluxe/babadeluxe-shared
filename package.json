@@ -49,7 +49,7 @@
   "scripts": {
     "pnpm:devPreinstall": "pnpx tsx ./setup-npmrc.ts",
     "prepack": "pnpx tsx ./setup-npmrc.ts",
-    "format": "xo --fix --prettier",
+    "format": "xo --fix --prettier *.ts",
     "generate-barrels": "barrelsby --config ./.barrelsby.json",
     "build": "unbuild",
     "test-package": "pnpm build && pnpm pack --dry-run",
