@@ -76,6 +76,10 @@ export default defineBuildConfig({
   rollup: {
     emitCJS: true,
     inlineDependencies: false,
+    esbuild: {
+      minify: false,
+      keepNames: true,
+    }
   },
 
   clean: true,

@@ -1,14 +1,14 @@
 /**
- * Settings Schema and Validation Module
+ * Zod schemas for user settings and their metadata.
  *
- * Single source of truth for settings validation across frontend and backend.
+ * This module defines:
+ * 1. `settingSchema`: The master schema for all user-configurable settings.
+ * 2. `settingMetadata`: Runtime metadata (encryption, categories) for each setting.
+ * 3. Validation and retrieval helpers.
  *
- * Architecture:
- * - `settingSchema`: Zod object for all settings (per-key schemas via `.shape`)
- * - `settingSchemas`: Record of per-key Zod schemas (alias of `settingSchema.shape`)
- * - `settingMetadata`: Runtime metadata (category, encryption, dataType)
- * - `UserSettingWithValidation`: TypeScript type for runtime (Date objects)
- * - `userSettingWithValidationSchema`: Zod schema for socket wire format (ISO strings)
+ * Note on Dates: Dates are expected to be ISO strings on the wire, but are
+ * treated as Date objects in the backend and frontend state where possible.
+ * The `UserSettingWire` type explicitly represents the socket wire format (ISO strings)
  *
  * @module settings-schemas
  */
@@ -23,7 +23,7 @@ import { z } from 'zod/v4'
  * - Backend SettingsService - Validates before encryption/storage
  * - Frontend forms - Client-side validation before submission
  */
-export const settingSchema = z.object({
+export const settingSchema = /* @__PURE__ */ z.object({
   apiKeyOpenai: z.string().min(23).describe('OpenAI API key for GPT models').optional(),
   apiKeyAnthropic: z.string().min(100).describe('Anthropic API key for Claude models').optional(),
   apiKeyGoogle: z.string().min(35).describe('Google Gemini API key').optional(),
@@ -216,7 +216,7 @@ export type UserSettingWithValidation = {
  * Used by:
  * - Backend socket actions - Validates output before transmission
  */
-export const userSettingWithValidationSchema = z.object({
+export const userSettingWithValidationSchema = /* @__PURE__ */ z.object({
   settingKey: z.string(),
   settingValue: z.unknown(),
   dataType: z.enum(['string', 'number', 'boolean']),
@@ -238,6 +238,7 @@ export const userSettingWithValidationSchema = z.object({
  * - Backend SettingsService - Enriches DB records with metadata
  * - Frontend - Displays validation rules and descriptions
  */
+/* @__NO_SIDE_EFFECTS__ */
 export function getSettingDefinition(
   key: string
 ): Omit<UserSettingWithValidation, 'settingKey' | 'settingValue' | 'updatedAt'> | undefined {
@@ -266,6 +267,7 @@ export function getSettingDefinition(
  * - Backend SettingsService - Validates before database save
  * - Frontend forms - Client-side validation before submission
  */
+/* @__NO_SIDE_EFFECTS__ */
 export function validateSetting(key: string, value: unknown) {
   const schema = settingSchemas[key as SettingKey]
   if (!schema) {
@@ -319,6 +321,7 @@ export const defaultTemperature = 1
  * const temp = getModelTemperature({ 'gpt-4o': 0.7 }, 'claude-sonnet-4-5') // 1.0
  * const temp2 = getModelTemperature({ 'gpt-4o': 0.7 }, 'gpt-4o')           // 0.7
  */
+/* @__NO_SIDE_EFFECTS__ */
 export function getModelTemperature(
   temperatures: ModelTemperatures | undefined,
   modelValue: string
@@ -329,6 +332,7 @@ export function getModelTemperature(
 /**
  * Set the temperature for a specific model, returning a new object (immutable).
  */
+/* @__NO_SIDE_EFFECTS__ */
 export function setModelTemperature(
   temperatures: ModelTemperatures | undefined,
   modelValue: string,
@@ -340,6 +344,7 @@ export function setModelTemperature(
 /**
  * Remove the temperature override for a specific model (reset to default).
  */
+/* @__NO_SIDE_EFFECTS__ */
 export function resetModelTemperature(
   temperatures: ModelTemperatures | undefined,
   modelValue: string
