@@ -121,7 +121,7 @@ export const settingSchema = /* @__PURE__ */ z.object({
    * Allowlist of Ollama model names that should appear in the model selector.
    *
    * An empty array means all discovered models are shown.
-   * Stored as a JSON array on the wire; parsed on read.
+   * Stored as a JSON string on the wire; parsed on read.
    *
    * Example: `["llama3", "mistral", "codellama"]`
    */
@@ -153,7 +153,7 @@ export const settingMetadata: Record<
   {
     readonly category: string
     readonly encrypted: boolean
-    readonly dataType: 'string' | 'number' | 'boolean' | 'json'
+    readonly dataType: 'string' | 'number' | 'boolean'
     readonly required: boolean
     readonly minLength?: number
     readonly maxLength?: number
@@ -238,7 +238,7 @@ export const settingMetadata: Record<
   ollamaEnabledModels: {
     category: 'ollama',
     encrypted: false,
-    dataType: 'json', // serialised JSON array on the wire
+    dataType: 'string', // serialised JSON array on the wire
     required: false,
   },
 } as const
@@ -253,7 +253,7 @@ export const settingMetadata: Record<
 export type UserSettingWithValidation = {
   readonly settingKey: string
   readonly settingValue: unknown
-  readonly dataType: 'string' | 'number' | 'boolean' | 'json'
+  readonly dataType: 'string' | 'number' | 'boolean'
   readonly updatedAt: Date
   readonly category: string
   readonly encrypted: boolean
@@ -274,7 +274,7 @@ export type UserSettingWithValidation = {
 export const userSettingWithValidationSchema = /* @__PURE__ */ z.object({
   settingKey: z.string(),
   settingValue: z.unknown(),
-  dataType: z.enum(['string', 'number', 'boolean', 'json']),
+  dataType: z.enum(['string', 'number', 'boolean']),
   updatedAt: z.iso.datetime(),
   required: z.boolean(),
   minLength: z.number().optional(),
