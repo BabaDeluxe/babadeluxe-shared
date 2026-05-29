@@ -95,6 +95,40 @@ export const settingSchema = /* @__PURE__ */ z.object({
     .record(z.string(), z.number().min(0).max(2))
     .describe('Per-model temperature overrides (model value → 0–2 float)')
     .optional(),
+
+  // ─── Ollama ────────────────────────────────────────────────────────────────
+
+  /**
+   * Base URL of the local Ollama instance (e.g. `"http://localhost:11434"`).
+   * User-scoped: one Ollama server serves all workspaces on the same machine.
+   */
+  ollamaUrl: z
+    .string()
+    .url()
+    .describe('Base URL of the local Ollama instance')
+    .optional(),
+
+  /**
+   * When `true`, the UI polls `models:listOllamaModels` to discover available
+   * models from the running Ollama instance.
+   */
+  ollamaModelDiscovery: z
+    .boolean()
+    .describe('Enable automatic discovery of models from the Ollama instance')
+    .optional(),
+
+  /**
+   * Allowlist of Ollama model names that should appear in the model selector.
+   *
+   * An empty array means all discovered models are shown.
+   * Stored as a JSON array on the wire; parsed on read.
+   *
+   * Example: `["llama3", "mistral", "codellama"]`
+   */
+  ollamaEnabledModels: z
+    .array(z.string())
+    .describe('Allowlist of Ollama model names shown in the model selector')
+    .optional(),
 })
 
 /**
@@ -119,7 +153,7 @@ export const settingMetadata: Record<
   {
     readonly category: string
     readonly encrypted: boolean
-    readonly dataType: 'string' | 'number' | 'boolean'
+    readonly dataType: 'string' | 'number' | 'boolean' | 'json'
     readonly required: boolean
     readonly minLength?: number
     readonly maxLength?: number
@@ -186,6 +220,27 @@ export const settingMetadata: Record<
     dataType: 'string', // serialised JSON object on the wire
     required: false,
   },
+
+  // ─── Ollama ────────────────────────────────────────────────────────────────
+
+  ollamaUrl: {
+    category: 'ollama',
+    encrypted: false,
+    dataType: 'string',
+    required: false,
+  },
+  ollamaModelDiscovery: {
+    category: 'ollama',
+    encrypted: false,
+    dataType: 'boolean',
+    required: false,
+  },
+  ollamaEnabledModels: {
+    category: 'ollama',
+    encrypted: false,
+    dataType: 'json', // serialised JSON array on the wire
+    required: false,
+  },
 } as const
 
 /**
@@ -198,7 +253,7 @@ export const settingMetadata: Record<
 export type UserSettingWithValidation = {
   readonly settingKey: string
   readonly settingValue: unknown
-  readonly dataType: 'string' | 'number' | 'boolean'
+  readonly dataType: 'string' | 'number' | 'boolean' | 'json'
   readonly updatedAt: Date
   readonly category: string
   readonly encrypted: boolean
@@ -219,7 +274,7 @@ export type UserSettingWithValidation = {
 export const userSettingWithValidationSchema = /* @__PURE__ */ z.object({
   settingKey: z.string(),
   settingValue: z.unknown(),
-  dataType: z.enum(['string', 'number', 'boolean']),
+  dataType: z.enum(['string', 'number', 'boolean', 'json']),
   updatedAt: z.iso.datetime(),
   required: z.boolean(),
   minLength: z.number().optional(),
@@ -352,3 +407,8 @@ export function resetModelTemperature(
   const { [modelValue]: _, ...rest } = temperatures ?? {}
   return rest
 }
+
+// ─── Ollama helpers ──────────────────────────────────────────────────────────
+
+/** Typed alias for the ollamaEnabledModels setting value. */
+export type OllamaEnabledModels = string[]
