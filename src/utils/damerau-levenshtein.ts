@@ -1,3 +1,4 @@
+/* @__NO_SIDE_EFFECTS__ */
 export function damerauLevenshteinSimilarity(first: string, second: string): number {
   const lengthFirst = first.length
   const lengthSecond = second.length
