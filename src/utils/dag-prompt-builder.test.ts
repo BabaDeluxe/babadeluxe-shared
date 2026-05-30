@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { DagPromptBuilder, DagPromptBuilderError } from './dag-prompt-builder.js'
 
 describe('DagPromptBuilder', () => {
@@ -37,7 +37,6 @@ describe('DagPromptBuilder', () => {
     builder.addNode({ id: 'c', dependsOn: ['a'], render: (d) => `c(${d.a})` })
     builder.addNode({ id: 'd', dependsOn: ['b', 'c'], render: (d) => `d(${d.b}+${d.c})` })
     const result = builder.build(' | ')
-    // All four nodes rendered; d has access to both b and c outputs
     expect(result).toContain('d(b(root)+c(root))')
   })
 
@@ -51,9 +50,7 @@ describe('DagPromptBuilder', () => {
   it('throws on duplicate node id', () => {
     const builder = new DagPromptBuilder()
     builder.addNode({ id: 'dup', render: () => '' })
-    expect(() => builder.addNode({ id: 'dup', render: () => '' })).toThrow(
-      DagPromptBuilderError
-    )
+    expect(() => builder.addNode({ id: 'dup', render: () => '' })).toThrow(DagPromptBuilderError)
   })
 
   it('throws on unknown dependency', () => {
@@ -65,7 +62,9 @@ describe('DagPromptBuilder', () => {
   it('throws on a direct cycle (a→b→a)', () => {
     const builder = new DagPromptBuilder()
     // Manually bypass addNode duplicate guard to plant the cycle
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ;(builder as any)._nodes.set('a', { id: 'a', dependsOn: ['b'], render: () => 'A' })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ;(builder as any)._nodes.set('b', { id: 'b', dependsOn: ['a'], render: () => 'B' })
     expect(() => builder.build()).toThrow('Cycle detected')
   })

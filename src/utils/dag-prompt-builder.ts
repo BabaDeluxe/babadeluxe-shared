@@ -14,6 +14,8 @@
  *   const prompt = builder.build()  // topologically ordered, concatenated
  */
 
+import { BaseError } from './base-error.js'
+
 export interface PromptNode {
   /** Unique identifier for this node. */
   id: string
@@ -30,12 +32,7 @@ export interface PromptNode {
   render: (resolvedDeps: Readonly<Record<string, string>>) => string
 }
 
-export class DagPromptBuilderError extends Error {
-  constructor(message: string) {
-    super(message)
-    this.name = 'DagPromptBuilderError'
-  }
-}
+export class DagPromptBuilderError extends BaseError {}
 
 export class DagPromptBuilder {
   private readonly _nodes = new Map<string, PromptNode>()
@@ -112,9 +109,7 @@ export class DagPromptBuilder {
     for (const [id, node] of this._nodes) {
       for (const dep of node.dependsOn ?? []) {
         if (!this._nodes.has(dep)) {
-          throw new DagPromptBuilderError(
-            `Node "${id}" depends on unknown node "${dep}".`
-          )
+          throw new DagPromptBuilderError(`Node "${id}" depends on unknown node "${dep}".`)
         }
       }
     }
