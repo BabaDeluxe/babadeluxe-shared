@@ -7,7 +7,7 @@
 <p align="left">
   <img src="https://img.shields.io/badge/license-EUPL%201.2-6a5acd?style=flat-rounded" alt="license">
   <img src="https://img.shields.io/badge/code_style-XO-8a2be2?style=flat-rounded" alt="code style: xo">
-  <img src="https://img.shields.io/badge/node-%3E%3D20-b06ab3?style=flat-rounded" alt="node version">
+  <img src="https://img.shields.io/badge/node-%3E%3D20.19%20%3C24-b06ab3?style=flat-rounded" alt="node version">
 </p>
 
 > **Shared types, Zod schemas, and utilities used across the BabaDeluxe ecosystem.** If it needs to be consistent between the extension, webview, and backend — it lives here.
@@ -18,12 +18,12 @@ This package is the single source of truth for cross-cutting concerns in BabaDel
 
 ## Entry Points
 
-| Import | Contents |
-| :--- | :--- |
-| `@babadeluxe/shared` | Main entry point — re-exports all sub-modules |
-| `@babadeluxe/shared/generated-socket-types` | Auto-generated Zod-based Socket.io event definitions |
-| `@babadeluxe/shared/settings` | User configuration schema, validation, and metadata |
-| `@babadeluxe/shared/utils` | General utilities: Damerau-Levenshtein distance, safe JSON parsing |
+| Import                                      | Contents                                                           |
+| :------------------------------------------ | :----------------------------------------------------------------- |
+| `@babadeluxe/shared`                        | Main entry point — re-exports all sub-modules                      |
+| `@babadeluxe/shared/generated-socket-types` | Auto-generated TypeScript interfaces for Socket.io events          |
+| `@babadeluxe/shared/settings`               | User configuration schema, validation, and metadata                |
+| `@babadeluxe/shared/utils`                  | General utilities: Damerau-Levenshtein distance, safe JSON parsing |
 
 ## Installation
 
@@ -69,6 +69,15 @@ if (result.isOk()) {
 }
 ```
 
+### Damerau-Levenshtein Similarity
+
+```typescript
+import { damerauLevenshteinSimilarity } from '@babadeluxe/shared/utils'
+
+const score = damerauLevenshteinSimilarity('typing', 'tpying')
+console.log(score) // 0.833... (high similarity due to transposition)
+```
+
 ## Contributor Setup
 
 This package uses a custom npm registry. To set up your local development environment:
@@ -86,15 +95,16 @@ This package uses a custom npm registry. To set up your local development enviro
 
 ## Development
 
-| Script | Description |
-| :--- | :--- |
-| `pnpm build` | Produces ESM, CJS, and `.d.ts` declarations via `unbuild` |
-| `pnpm format` | Lints and formats with XO + Prettier |
-| `pnpm generate-barrels` | Regenerates barrel exports via `barrelsby` |
-| `pnpm test-package` | Builds and performs a dry-run pack to verify integrity |
-| `pnpm publish-patch` | Bumps version (patch) and publishes to the custom registry |
-| `pnpm publish-minor` | Bumps version (minor) and publishes to the custom registry |
-| `pnpm publish-major` | Bumps version (major) and publishes to the custom registry |
+| Script                  | Description                                                |
+| :---------------------- | :--------------------------------------------------------- |
+| `pnpm build`            | Produces ESM, CJS, and `.d.ts` declarations via `unbuild`  |
+| `pnpm format`           | Lints and formats with XO + Prettier                       |
+| `pnpm generate-barrels` | Regenerates barrel exports via `barrelsby`                 |
+| `pnpm test-package`     | Builds and performs a dry-run pack to verify integrity     |
+| `pnpm publish-patch`    | Bumps version (patch) and publishes to the custom registry |
+| `pnpm publish-minor`    | Bumps version (minor) and publishes to the custom registry |
+| `pnpm publish-major`    | Bumps version (major) and publishes to the custom registry |
+| `pnpm prepare`          | Installs Husky git hooks                                   |
 
 ## License
 
