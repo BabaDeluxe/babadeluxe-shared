@@ -1,35 +1,32 @@
 # Documentation Drift Report
 
-**Run Date/Time:** 2025-05-22 03:30 UTC
+**Run Date/Time:** 2025-05-23 09:15 UTC
 **Branch Analyzed:** `master`
 
 ## Files Reviewed
 
 - `README.md`
-- `.env.local.example`
 - `package.json`
-- `setup-npmrc.ts`
-- `publish.ts`
 - `src/settings/settings-socket-schema.ts`
 - `src/utils/safe-json-parse.ts`
+- `src/utils/damerau-levenshtein.ts`
 - `src/generated-socket-types/socket-types.ts`
 
 ## Regressions & Gaps Found
 
-1.  **Incomplete Setup Environment:** `.env.local.example` only contained `NPM_TOKEN`, but `setup-npmrc.ts` requires `NPM_PACKAGE_SCOPE`, `NPM_REGISTRY`, and `NPM_REGISTRY_URL`.
-2.  **Missing Onboarding Docs:** No documentation existed explaining how to set up the local development environment, specifically regarding the automatic `.npmrc` generation via the preinstall hook.
-3.  **Undocumented Scripts:** Several useful scripts in `package.json` (`test-package`, `publish-patch`, `publish-minor`, `publish-major`) were missing from the `README.md` development table.
-4.  **Utility Usage Drift:** `safeJsonParse` uses `neverthrow` Results, but this wasn't documented, potentially leading to incorrect usage by consumers.
+1.  **Node.js Version Mismatch:** `README.md` badge shows `node >=20`, but `package.json` specifies `>=20.19 <24`.
+2.  **Missing Husky Hook Setup Script:** The `prepare` script (used for Husky) is missing from the Development scripts table in `README.md`.
+3.  **Socket Types Description Drift:** `README.md` describes `generated-socket-types` as "Zod-based Socket.io event definitions," which is technically correct (they are generated from Zod), but the exported artifacts are TypeScript interfaces.
+4.  **Missing Utility Documentation:** The `damerauLevenshteinSimilarity` utility is exported but lacks a usage example in `README.md`.
 
 ## Files Changed
 
 - `README.md`
-- `.env.local.example`
 - `DOC_DRIFT.md`
 
 ## Fixes Applied
 
-- **Environment Setup:** Updated `.env.local.example` with all variables required by the setup script.
-- **Onboarding:** Added a "Contributor Setup" section to `README.md` detailing the env file copy and `pnpm install` workflow.
-- **Script Visibility:** Populated the "Development" scripts table in `README.md` with all relevant developer-facing commands.
-- **Example Clarity:** Added a usage example for `safeJsonParse` in `README.md` highlighting the `neverthrow` Result pattern.
+- **Node.js Version:** Updated the version badge to match the specific range in `package.json`.
+- **Script Visibility:** Added the `prepare` script to the Development table.
+- **Socket Types Clarity:** Refined the description of the generated socket types import.
+- **Utility Documentation:** Added a usage example for `damerauLevenshteinSimilarity` to the Usage section.
