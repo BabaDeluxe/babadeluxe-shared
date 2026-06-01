@@ -129,6 +129,68 @@ export const settingSchema = /* @__PURE__ */ z.object({
     .array(z.string())
     .describe('Allowlist of Ollama model names shown in the model selector')
     .optional(),
+
+  // ─── Providers ─────────────────────────────────────────────────────────────
+
+  /**
+   * OpenRouter API key.
+   * Routes requests through openrouter.ai — single key for 300+ models.
+   * Min length 20 to catch obvious garbage; full format is `sk-or-v1-…`.
+   */
+  apiKeyOpenrouter: z
+    .string()
+    .min(20)
+    .describe('OpenRouter API key (sk-or-v1-…)')
+    .optional(),
+
+  /**
+   * OpenRouter base URL.
+   * Defaults to `https://openrouter.ai/api/v1` in the backend resolveProvider().
+   * Override only if routing through a proxy.
+   */
+  openrouterBaseUrl: z
+    .string()
+    .url()
+    .describe('OpenRouter base URL (default: https://openrouter.ai/api/v1)')
+    .optional(),
+
+  /**
+   * When `true`, the backend routes requests through the custom provider
+   * defined by `customProviderBaseUrl` and `customProviderApiKey`.
+   */
+  customProviderEnabled: z
+    .boolean()
+    .describe('Route requests through the custom OpenAI-compatible provider')
+    .optional(),
+
+  /**
+   * Display label for the custom provider shown in the UI (e.g. `"LM Studio"`).
+   * Max 32 characters.
+   */
+  customProviderName: z
+    .string()
+    .max(32)
+    .describe('Display name for the custom provider (e.g. LM Studio)')
+    .optional(),
+
+  /**
+   * Base URL of the custom OpenAI-compatible endpoint.
+   * Examples: `http://localhost:1234/v1` (LM Studio), `https://api.groq.com/openai/v1`.
+   */
+  customProviderBaseUrl: z
+    .string()
+    .url()
+    .describe('Base URL of the custom OpenAI-compatible endpoint')
+    .optional(),
+
+  /**
+   * API key for the custom provider.
+   * May be an empty string for local providers that do not require authentication.
+   */
+  customProviderApiKey: z
+    .string()
+    .describe('API key for the custom provider (may be empty for local endpoints)')
+    .optional(),
 })
 
 /**
@@ -239,6 +301,47 @@ export const settingMetadata: Record<
     category: 'ollama',
     encrypted: false,
     dataType: 'string', // serialised JSON array on the wire
+    required: false,
+  },
+
+  // ─── Providers ─────────────────────────────────────────────────────────────
+
+  apiKeyOpenrouter: {
+    category: 'providers',
+    encrypted: true,
+    dataType: 'string',
+    minLength: 20,
+    required: false,
+  },
+  openrouterBaseUrl: {
+    category: 'providers',
+    encrypted: false,
+    dataType: 'string',
+    required: false,
+  },
+  customProviderEnabled: {
+    category: 'providers',
+    encrypted: false,
+    dataType: 'boolean',
+    required: false,
+  },
+  customProviderName: {
+    category: 'providers',
+    encrypted: false,
+    dataType: 'string',
+    maxLength: 32,
+    required: false,
+  },
+  customProviderBaseUrl: {
+    category: 'providers',
+    encrypted: false,
+    dataType: 'string',
+    required: false,
+  },
+  customProviderApiKey: {
+    category: 'providers',
+    encrypted: true,
+    dataType: 'string',
     required: false,
   },
 } as const
