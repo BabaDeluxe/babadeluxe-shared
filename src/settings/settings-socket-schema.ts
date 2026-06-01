@@ -13,7 +13,9 @@
  * @module settings-schemas
  */
 
+
 import { z } from 'zod/v4'
+
 
 /**
  * Zod validation schema for all settings.
@@ -29,6 +31,7 @@ export const settingSchema = /* @__PURE__ */ z.object({
   apiKeyGoogle: z.string().min(35).describe('Google Gemini API key').optional(),
   theme: z.enum(['dark', 'light']).describe('UI theme').optional(),
 
+
   /**
    * Determines when the system prompt is appended during a conversation.
    *
@@ -43,6 +46,7 @@ export const settingSchema = /* @__PURE__ */ z.object({
     .describe('When to append the system prompt during a conversation')
     .optional(),
 
+
   /**
    * Number of messages between automatic re-injections.
    * Only used when `promptInjectionMode` is `every-x-messages`.
@@ -56,6 +60,7 @@ export const settingSchema = /* @__PURE__ */ z.object({
     .describe('Message interval for every-x-messages injection mode')
     .optional(),
 
+
   /**
    * Where the prompt is injected in the message array.
    *
@@ -68,6 +73,7 @@ export const settingSchema = /* @__PURE__ */ z.object({
     .describe('Where to inject the prompt relative to the message array')
     .optional(),
 
+
   /**
    * Whether to re-include prior conversation history when re-injecting the prompt
    * mid-conversation (relevant for `every-x-messages` and `on-prompt-change` modes).
@@ -76,6 +82,7 @@ export const settingSchema = /* @__PURE__ */ z.object({
     .boolean()
     .describe('Re-include conversation history when re-injecting the prompt')
     .optional(),
+
 
   /**
    * Per-model temperature overrides stored as a JSON object.
@@ -88,15 +95,17 @@ export const settingSchema = /* @__PURE__ */ z.object({
    * { "gpt-4o": 0.7, "claude-sonnet-4-5": 0.3 }
    * ```
    *
-   * Stored as a JSON string on the wire; parsed on read.
-   * When a model key is absent the provider default (usually 1.0) is used.
+   * Stored as a JSON string in the DB; serialised/deserialised transparently
+   * by SettingsService. When a model key is absent the provider default (1.0) is used.
    */
   modelTemperatures: z
     .record(z.string(), z.number().min(0).max(2))
     .describe('Per-model temperature overrides (model value → 0–2 float)')
     .optional(),
 
+
   // ─── Ollama ────────────────────────────────────────────────────────────────
+
 
   /**
    * Base URL of the local Ollama instance (e.g. `"http://localhost:11434"`).
@@ -108,6 +117,7 @@ export const settingSchema = /* @__PURE__ */ z.object({
     .describe('Base URL of the local Ollama instance')
     .optional(),
 
+
   /**
    * When `true`, the UI polls `models:listOllamaModels` to discover available
    * models from the running Ollama instance.
@@ -117,11 +127,13 @@ export const settingSchema = /* @__PURE__ */ z.object({
     .describe('Enable automatic discovery of models from the Ollama instance')
     .optional(),
 
+
   /**
    * Allowlist of Ollama model names that should appear in the model selector.
    *
    * An empty array means all discovered models are shown.
-   * Stored as a JSON string on the wire; parsed on read.
+   * Stored as a JSON string in the DB; serialised/deserialised transparently
+   * by SettingsService.
    *
    * Example: `["llama3", "mistral", "codellama"]`
    */
@@ -130,7 +142,9 @@ export const settingSchema = /* @__PURE__ */ z.object({
     .describe('Allowlist of Ollama model names shown in the model selector')
     .optional(),
 
+
   // ─── Providers ─────────────────────────────────────────────────────────────
+
 
   /**
    * OpenRouter API key.
@@ -143,6 +157,7 @@ export const settingSchema = /* @__PURE__ */ z.object({
     .describe('OpenRouter API key (sk-or-v1-…)')
     .optional(),
 
+
   /**
    * OpenRouter base URL.
    * Defaults to `https://openrouter.ai/api/v1` in the backend resolveProvider().
@@ -154,6 +169,7 @@ export const settingSchema = /* @__PURE__ */ z.object({
     .describe('OpenRouter base URL (default: https://openrouter.ai/api/v1)')
     .optional(),
 
+
   /**
    * When `true`, the backend routes requests through the custom provider
    * defined by `customProviderBaseUrl` and `customProviderApiKey`.
@@ -162,6 +178,7 @@ export const settingSchema = /* @__PURE__ */ z.object({
     .boolean()
     .describe('Route requests through the custom OpenAI-compatible provider')
     .optional(),
+
 
   /**
    * Display label for the custom provider shown in the UI (e.g. `"LM Studio"`).
@@ -173,6 +190,7 @@ export const settingSchema = /* @__PURE__ */ z.object({
     .describe('Display name for the custom provider (e.g. LM Studio)')
     .optional(),
 
+
   /**
    * Base URL of the custom OpenAI-compatible endpoint.
    * Examples: `http://localhost:1234/v1` (LM Studio), `https://api.groq.com/openai/v1`.
@@ -183,6 +201,7 @@ export const settingSchema = /* @__PURE__ */ z.object({
     .describe('Base URL of the custom OpenAI-compatible endpoint')
     .optional(),
 
+
   /**
    * API key for the custom provider.
    * May be an empty string for local providers that do not require authentication.
@@ -192,7 +211,9 @@ export const settingSchema = /* @__PURE__ */ z.object({
     .describe('API key for the custom provider (may be empty for local endpoints)')
     .optional(),
 
+
   // ─── Inference controls ────────────────────────────────────────────────────
+
 
   /**
    * Reasoning effort level for models that support extended thinking.
@@ -210,6 +231,7 @@ export const settingSchema = /* @__PURE__ */ z.object({
     .describe('Reasoning effort level for thinking-capable models')
     .optional(),
 
+
   /**
    * When `true`, enables web search grounding for supported models.
    *
@@ -221,6 +243,7 @@ export const settingSchema = /* @__PURE__ */ z.object({
     .boolean()
     .describe('Enable web search grounding for supported models')
     .optional(),
+
 
   /**
    * When `true`, enables Anthropic prompt caching (`cache_control: { type: 'ephemeral' }`)
@@ -235,6 +258,7 @@ export const settingSchema = /* @__PURE__ */ z.object({
     .boolean()
     .describe('Enable Anthropic prompt caching (no-op for non-Anthropic models)')
     .optional(),
+
 
   /**
    * When `true`, `UserChoiceRouter` will fall through to the next available
@@ -254,15 +278,18 @@ export const settingSchema = /* @__PURE__ */ z.object({
     .optional(),
 })
 
+
 /**
  * Record of per-key schemas (for the "map of schemas" philosophy).
  */
 export const settingSchemas = settingSchema.shape
 
+
 /**
  * Union type of all valid setting keys.
  */
-type SettingKey = keyof typeof settingSchemas
+export type SettingKey = keyof typeof settingSchemas
+
 
 /**
  * Runtime metadata for each setting.
@@ -340,11 +367,13 @@ export const settingMetadata: Record<
   modelTemperatures: {
     category: 'model',
     encrypted: false,
-    dataType: 'string', // serialised JSON object on the wire
+    dataType: 'string',
     required: false,
   },
 
+
   // ─── Ollama ────────────────────────────────────────────────────────────────
+
 
   ollamaUrl: {
     category: 'ollama',
@@ -361,11 +390,13 @@ export const settingMetadata: Record<
   ollamaEnabledModels: {
     category: 'ollama',
     encrypted: false,
-    dataType: 'string', // serialised JSON array on the wire
+    dataType: 'string',
     required: false,
   },
 
+
   // ─── Providers ─────────────────────────────────────────────────────────────
+
 
   apiKeyOpenrouter: {
     category: 'providers',
@@ -406,7 +437,9 @@ export const settingMetadata: Record<
     required: false,
   },
 
+
   // ─── Inference controls ────────────────────────────────────────────────────
+
 
   reasoningEffort: {
     category: 'inference',
@@ -434,6 +467,7 @@ export const settingMetadata: Record<
   },
 } as const
 
+
 /**
  * TypeScript type for user settings with validation metadata.
  *
@@ -456,6 +490,7 @@ export type UserSettingWithValidation = {
   readonly maxValue?: number
 }
 
+
 /**
  * Zod schema for socket.io wire format validation.
  *
@@ -477,6 +512,7 @@ export const userSettingWithValidationSchema = /* @__PURE__ */ z.object({
   encrypted: z.boolean(),
 })
 
+
 /**
  * Get complete definition for a setting by key.
  *
@@ -491,20 +527,23 @@ export function getSettingDefinition(
   const schema = settingSchemas[key as SettingKey]
   const metadata = settingMetadata[key as SettingKey]
 
+
   if (!schema || !metadata) return undefined
+
 
   return {
     category: metadata.category,
     encrypted: metadata.encrypted,
     dataType: metadata.dataType,
     required: metadata.required,
-    description: (schema as { description?: string }).description ?? '',
+    description: schema.description ?? '',
     minLength: metadata.minLength,
     maxLength: metadata.maxLength,
     minValue: metadata.minValue,
     maxValue: metadata.maxValue,
   }
 }
+
 
 /**
  * Validate a setting value against its schema.
@@ -520,6 +559,7 @@ export function validateSetting(key: string, value: unknown) {
     return { success: false as const, error: `Unknown setting: ${key}` }
   }
 
+
   const result = schema.safeParse(value)
   return result.success
     ? { success: true as const, data: result.data }
@@ -529,6 +569,7 @@ export function validateSetting(key: string, value: unknown) {
       }
 }
 
+
 /**
  * Wire-safe type for socket transmission (Date → ISO string)
  */
@@ -536,13 +577,17 @@ export type UserSettingWire = Omit<UserSettingWithValidation, 'updatedAt'> & {
   readonly updatedAt: string
 }
 
+
 // ─── Prompt injection helpers ────────────────────────────────────────────────
+
 
 /** Typed alias for all valid injection modes. */
 export type PromptInjectionMode = z.infer<typeof settingSchema.shape.promptInjectionMode>
 
+
 /** Typed alias for all valid injection positions. */
 export type PromptInjectionPosition = z.infer<typeof settingSchema.shape.promptInjectionPosition>
+
 
 /** Default values used when a setting is absent. */
 export const promptInjectionDefaults = {
@@ -552,13 +597,17 @@ export const promptInjectionDefaults = {
   includeHistory: true,
 } as const
 
+
 // ─── Model temperature helpers ────────────────────────────────────────────────
+
 
 /** Shape of the modelTemperatures setting value. */
 export type ModelTemperatures = Record<string, number>
 
+
 /** Provider default temperature used when no override exists. */
 export const defaultTemperature = 1
+
 
 /**
  * Get the temperature for a specific model, falling back to the provider default.
@@ -575,6 +624,7 @@ export function getModelTemperature(
   return temperatures?.[modelValue] ?? defaultTemperature
 }
 
+
 /**
  * Set the temperature for a specific model, returning a new object (immutable).
  */
@@ -586,6 +636,7 @@ export function setModelTemperature(
 ): ModelTemperatures {
   return { ...temperatures, [modelValue]: value }
 }
+
 
 /**
  * Remove the temperature override for a specific model (reset to default).
@@ -599,15 +650,20 @@ export function resetModelTemperature(
   return rest
 }
 
+
 // ─── Ollama helpers ──────────────────────────────────────────────────────────
+
 
 /** Typed alias for the ollamaEnabledModels setting value. */
 export type OllamaEnabledModels = string[]
 
+
 // ─── Inference control helpers ────────────────────────────────────────────────
+
 
 /** Typed alias for all valid reasoning effort levels. */
 export type ReasoningEffort = NonNullable<z.infer<typeof settingSchema.shape.reasoningEffort>>
+
 
 /** Default reasoning effort used when the setting is absent. */
 export const defaultReasoningEffort: ReasoningEffort = 'medium'
