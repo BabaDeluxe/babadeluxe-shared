@@ -21,6 +21,21 @@ export namespace Root {
             chunk: string;
             sequence: number;
         }) => void;
+        /**
+         * Emitted for each reasoning/thinking token chunk streamed from a
+         * reasoning-capable model (DeepSeek R1, Claude extended thinking,
+         * Gemini Flash Thinking, OpenAI o-series).
+         *
+         * Mirrors `chat:messageChunk` shape exactly. Accumulate `chunk` values
+         * in `sequence` order to reconstruct the full reasoning trace.
+         *
+         * Linked to: babadeluxe-backend#32, babadeluxe-shared#10
+         */
+        "chat:reasoningChunk": (p1: {
+            messageId: number;
+            chunk: string;
+            sequence: number;
+        }) => void;
         "chat:messageComplete": (p1: {
             messageId: number;
             fullContent: string;

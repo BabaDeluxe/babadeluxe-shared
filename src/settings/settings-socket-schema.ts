@@ -31,24 +31,24 @@ export const settingSchema = /* @__PURE__ */ z.object({
   apiKeyGoogle: z.string().min(35).describe('Google Gemini API key').optional(),
 
   /**
-   * OpenRouter API key.
-   * Used by: babadeluxe-backend#18
+   * OpenRouter API key (starts with `sk-or-v1-`).
+   * Min length 20 — shorter than other keys since format varies slightly.
    */
   apiKeyOpenrouter: z
     .string()
-    .min(1)
+    .min(20)
     .describe('OpenRouter API key')
     .optional(),
 
   /**
-   * Optional custom OpenRouter base URL override.
-   * Defaults to `https://openrouter.ai/api/v1` if absent.
-   * Used by: babadeluxe-backend#18
+   * Custom base URL for the OpenRouter API (or any OpenAI-compatible endpoint
+   * routed through OpenRouter). Defaults to `https://openrouter.ai/api/v1`
+   * when absent.
    */
   openrouterBaseUrl: z
     .string()
     .url()
-    .describe('Custom OpenRouter base URL (defaults to https://openrouter.ai/api/v1)')
+    .describe('Custom base URL for the OpenRouter API endpoint')
     .optional(),
 
   theme: z.enum(['dark', 'light']).describe('UI theme').optional(),
@@ -126,58 +126,68 @@ export const settingSchema = /* @__PURE__ */ z.object({
     .optional(),
 
 
-  // ─── Reasoning ────────────────────────────────────────────────────────────
+  // ─── Reasoning ──────────────────────────────────────────────────────────────
 
 
   /**
-   * Per-model reasoning effort overrides stored as a JSON object.
+   * Reasoning effort level passed to supported models.
    *
-   * Keys are model value strings. Values are one of `"low" | "medium" | "high"`.
-   * Applies to models that support extended thinking / reasoning mode:
-   * - OpenAI o-series: maps to `reasoning_effort`
-   * - Anthropic Claude 3.5/3.7 thinking: maps to `budget_tokens` (low=1024, medium=8192, high=32768)
-   * - DeepSeek R1 / Gemini Flash Thinking: handled per-provider
+   * - `off`     – Disable reasoning/thinking mode entirely.
+   * - `minimal` – Shortest possible reasoning trace (lowest token cost).
+   * - `low`     – Light reasoning; good balance for most tasks.
+   * - `medium`  – Standard reasoning; default when reasoning is enabled.
+   * - `high`    – Maximum reasoning depth; highest token cost.
    *
-   * Stored as a JSON string on the wire; parsed on read.
-   * When a model key is absent, the provider default is used (no extended reasoning).
+   * Mapping per provider:
+   * - OpenAI o-series  → `reasoning_effort: "low" | "medium" | "high"`
+   * - Anthropic Claude → `thinking: { type: "enabled", budget_tokens: N }`
+   * - OpenRouter       → `extra_body.reasoning.effort`
+   * - DeepSeek R1      → passed via system prompt convention
    *
-   * Used by: babadeluxe-backend#19
+   * Only applied when the model's `ReasoningConfig` is non-null.
    */
   reasoningEffort: z
-    .record(z.string(), z.enum(['low', 'medium', 'high']))
-    .describe('Per-model reasoning effort overrides (model value → low | medium | high)')
+    .enum(['off', 'minimal', 'low', 'medium', 'high'])
+    .describe('Reasoning effort level for models that support extended thinking')
     .optional(),
 
 
-  // ─── Web search ────────────────────────────────────────────────────────────
-
-
   /**
-   * When `true`, the backend injects the provider's native web-search tool
-   * for the current request (OpenAI `web_search_preview`, Anthropic
-   * `web_search_20250305`).
+   * When `true`, inject Anthropic `cache_control` breakpoints on system
+   * and long user messages to enable prompt caching.
    *
-   * Used by: babadeluxe-backend#26
-   */
-  webSearchEnabled: z
-    .boolean()
-    .describe('Enable provider-native web search for supported models')
-    .optional(),
-
-
-  // ─── Prompt caching ────────────────────────────────────────────────────────
-
-
-  /**
-   * When `true`, the backend adds `cache_control: { type: "ephemeral" }` breakpoints
-   * to Anthropic requests for prompt-caching savings.
-   * No-op for non-Anthropic providers.
-   *
-   * Used by: babadeluxe-shared#10 (future)
+   * Only has effect for Anthropic Claude models. Ignored for all other providers.
    */
   promptCachingEnabled: z
     .boolean()
-    .describe('Enable Anthropic prompt caching (cache_control breakpoints)')
+    .describe('Enable Anthropic prompt caching via cache_control breakpoints')
+    .optional(),
+
+
+  /**
+   * When `true`, enable the provider's web search tool/plugin for supported models.
+   *
+   * Provider-specific behaviour:
+   * - OpenAI          → adds `{ type: "web_search_preview" }` to `tools[]`
+   * - Anthropic        → adds `{ type: "web_search_20250305", ... }` to `tools[]`
+   * - Gemini           → enables `google_search` grounding tool
+   * - OpenRouter       → passes `plugins: [{ id: "web" }]` in `extra_body`
+   */
+  webSearchEnabled: z
+    .boolean()
+    .describe('Enable web search tool for supported models')
+    .optional(),
+
+
+  /**
+   * When `true`, the `UserChoiceRouter` (backend#22) is allowed to fall back
+   * to the next available provider/key when the primary selection fails.
+   *
+   * Used by: `StreamOrchestrator` → `IProviderRouter.fallback()`
+   */
+  fallbackEnabled: z
+    .boolean()
+    .describe('Allow automatic provider fallback when the primary selection fails')
     .optional(),
 
 
@@ -244,7 +254,7 @@ export const settingMetadata: Record<
   {
     readonly category: string
     readonly encrypted: boolean
-    readonly dataType: 'string' | 'number' | 'boolean' | 'json-object' | 'json-array'
+    readonly dataType: 'string' | 'number' | 'boolean'
     readonly required: boolean
     readonly minLength?: number
     readonly maxLength?: number
@@ -277,7 +287,7 @@ export const settingMetadata: Record<
     category: 'apiKey',
     encrypted: true,
     dataType: 'string',
-    minLength: 1,
+    minLength: 20,
     required: false,
   },
   openrouterBaseUrl: {
@@ -321,31 +331,38 @@ export const settingMetadata: Record<
   modelTemperatures: {
     category: 'model',
     encrypted: false,
-    dataType: 'json-object',
+    dataType: 'string', // serialised JSON object on the wire
     required: false,
   },
+
+  // ─── Reasoning ──────────────────────────────────────────────────────────────
+
   reasoningEffort: {
-    category: 'model',
+    category: 'reasoning',
     encrypted: false,
-    dataType: 'json-object',
-    required: false,
-  },
-  webSearchEnabled: {
-    category: 'model',
-    encrypted: false,
-    dataType: 'boolean',
+    dataType: 'string',
     required: false,
   },
   promptCachingEnabled: {
-    category: 'prompt',
+    category: 'reasoning',
+    encrypted: false,
+    dataType: 'boolean',
+    required: false,
+  },
+  webSearchEnabled: {
+    category: 'reasoning',
+    encrypted: false,
+    dataType: 'boolean',
+    required: false,
+  },
+  fallbackEnabled: {
+    category: 'model',
     encrypted: false,
     dataType: 'boolean',
     required: false,
   },
 
-
   // ─── Ollama ────────────────────────────────────────────────────────────────
-
 
   ollamaUrl: {
     category: 'ollama',
@@ -362,7 +379,7 @@ export const settingMetadata: Record<
   ollamaEnabledModels: {
     category: 'ollama',
     encrypted: false,
-    dataType: 'json-array',
+    dataType: 'string', // serialised JSON array on the wire
     required: false,
   },
 } as const
@@ -378,7 +395,7 @@ export const settingMetadata: Record<
 export type UserSettingWithValidation = {
   readonly settingKey: string
   readonly settingValue: unknown
-  readonly dataType: 'string' | 'number' | 'boolean' | 'json-object' | 'json-array'
+  readonly dataType: 'string' | 'number' | 'boolean'
   readonly updatedAt: Date
   readonly category: string
   readonly encrypted: boolean
@@ -400,7 +417,7 @@ export type UserSettingWithValidation = {
 export const userSettingWithValidationSchema = /* @__PURE__ */ z.object({
   settingKey: z.string(),
   settingValue: z.unknown(),
-  dataType: z.enum(['string', 'number', 'boolean', 'json-object', 'json-array']),
+  dataType: z.enum(['string', 'number', 'boolean']),
   updatedAt: z.iso.datetime(),
   required: z.boolean(),
   minLength: z.number().optional(),
@@ -434,7 +451,7 @@ export function getSettingDefinition(
     encrypted: metadata.encrypted,
     dataType: metadata.dataType,
     required: metadata.required,
-    description: schema.description ?? '',
+    description: (schema as { description?: string }).description ?? '',
     minLength: metadata.minLength,
     maxLength: metadata.maxLength,
     minValue: metadata.minValue,
@@ -495,6 +512,17 @@ export const promptInjectionDefaults = {
 } as const
 
 
+// ─── Reasoning helpers ───────────────────────────────────────────────────────
+
+
+/** Typed alias for all valid reasoning effort levels. */
+export type ReasoningEffort = z.infer<typeof settingSchema.shape.reasoningEffort>
+
+
+/** Default reasoning effort when the setting is absent but reasoning is enabled. */
+export const defaultReasoningEffort: NonNullable<ReasoningEffort> = 'medium'
+
+
 // ─── Model temperature helpers ────────────────────────────────────────────────
 
 
@@ -544,60 +572,6 @@ export function resetModelTemperature(
   modelValue: string
 ): ModelTemperatures {
   const { [modelValue]: _, ...rest } = temperatures ?? {}
-  return rest
-}
-
-
-// ─── Reasoning effort helpers ─────────────────────────────────────────────────
-
-
-/** Valid reasoning effort levels. */
-export type ReasoningEffortLevel = 'low' | 'medium' | 'high'
-
-
-/** Shape of the reasoningEffort setting value. */
-export type ReasoningEffortMap = Record<string, ReasoningEffortLevel>
-
-
-/**
- * Get the reasoning effort for a specific model, returning `undefined` when
- * no override is set (provider default = no extended reasoning).
- *
- * @example
- * getReasoningEffort({ 'claude-opus-4-5': 'high' }, 'claude-opus-4-5') // 'high'
- * getReasoningEffort({ 'claude-opus-4-5': 'high' }, 'gpt-4o')          // undefined
- */
-/* @__NO_SIDE_EFFECTS__ */
-export function getReasoningEffort(
-  efforts: ReasoningEffortMap | undefined,
-  modelValue: string
-): ReasoningEffortLevel | undefined {
-  return efforts?.[modelValue]
-}
-
-
-/**
- * Set the reasoning effort for a specific model, returning a new object (immutable).
- */
-/* @__NO_SIDE_EFFECTS__ */
-export function setReasoningEffort(
-  efforts: ReasoningEffortMap | undefined,
-  modelValue: string,
-  level: ReasoningEffortLevel
-): ReasoningEffortMap {
-  return { ...efforts, [modelValue]: level }
-}
-
-
-/**
- * Remove the reasoning effort override for a specific model.
- */
-/* @__NO_SIDE_EFFECTS__ */
-export function resetReasoningEffort(
-  efforts: ReasoningEffortMap | undefined,
-  modelValue: string
-): ReasoningEffortMap {
-  const { [modelValue]: _, ...rest } = efforts ?? {}
   return rest
 }
 
