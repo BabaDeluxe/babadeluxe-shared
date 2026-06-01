@@ -10,6 +10,12 @@
  * treated as Date objects in the backend and frontend state where possible.
  * The `UserSettingWire` type explicitly represents the socket wire format (ISO strings)
  *
+ * Design contract:
+ * - `settingSchema` is the single source of truth for validation constraints.
+ * - `settingMetadata` holds ONLY runtime concerns (encryption, category, dataType).
+ *   It must NOT duplicate min/max values — those are derived from the Zod schema
+ *   in `getSettingDefinition()` to prevent drift.
+ *
  * @module settings-schemas
  */
 
@@ -31,24 +37,23 @@ export const settingSchema = /* @__PURE__ */ z.object({
   apiKeyGoogle: z.string().min(35).describe('Google Gemini API key').optional(),
 
   /**
-   * OpenRouter API key (starts with `sk-or-v1-`).
-   * Min length 20 — shorter than other keys since format varies slightly.
+   * API key for the OpenRouter proxy (https://openrouter.ai).
+   * Allows access to all supported providers via a single key.
    */
   apiKeyOpenrouter: z
     .string()
-    .min(20)
+    .min(40)
     .describe('OpenRouter API key')
     .optional(),
 
   /**
-   * Custom base URL for the OpenRouter API (or any OpenAI-compatible endpoint
-   * routed through OpenRouter). Defaults to `https://openrouter.ai/api/v1`
-   * when absent.
+   * Base URL override for the OpenRouter API.
+   * Defaults to https://openrouter.ai/api/v1 when absent.
    */
   openrouterBaseUrl: z
     .string()
     .url()
-    .describe('Custom base URL for the OpenRouter API endpoint')
+    .describe('OpenRouter base URL (defaults to https://openrouter.ai/api/v1)')
     .optional(),
 
   theme: z.enum(['dark', 'light']).describe('UI theme').optional(),
@@ -126,68 +131,31 @@ export const settingSchema = /* @__PURE__ */ z.object({
     .optional(),
 
 
-  // ─── Reasoning ──────────────────────────────────────────────────────────────
-
-
   /**
-   * Reasoning effort level passed to supported models.
+   * Reasoning effort level for models that support extended thinking
+   * (e.g. Claude with `thinking` enabled, OpenAI o-series, DeepSeek R1).
    *
-   * - `off`     – Disable reasoning/thinking mode entirely.
-   * - `minimal` – Shortest possible reasoning trace (lowest token cost).
-   * - `low`     – Light reasoning; good balance for most tasks.
-   * - `medium`  – Standard reasoning; default when reasoning is enabled.
-   * - `high`    – Maximum reasoning depth; highest token cost.
+   * - `low`    – Minimal reasoning; fastest and cheapest.
+   * - `medium` – Balanced; recommended default.
+   * - `high`   – Maximum reasoning depth; slower and more expensive.
    *
-   * Mapping per provider:
-   * - OpenAI o-series  → `reasoning_effort: "low" | "medium" | "high"`
-   * - Anthropic Claude → `thinking: { type: "enabled", budget_tokens: N }`
-   * - OpenRouter       → `extra_body.reasoning.effort`
-   * - DeepSeek R1      → passed via system prompt convention
-   *
-   * Only applied when the model's `ReasoningConfig` is non-null.
+   * Ignored for models that do not support reasoning.
    */
   reasoningEffort: z
-    .enum(['off', 'minimal', 'low', 'medium', 'high'])
+    .enum(['low', 'medium', 'high'])
     .describe('Reasoning effort level for models that support extended thinking')
     .optional(),
 
 
   /**
-   * When `true`, inject Anthropic `cache_control` breakpoints on system
-   * and long user messages to enable prompt caching.
+   * When `true`, enables the web search tool for models that support it
+   * (e.g. GPT-4o with Responses API, Gemini with grounding, OpenRouter search).
    *
-   * Only has effect for Anthropic Claude models. Ignored for all other providers.
-   */
-  promptCachingEnabled: z
-    .boolean()
-    .describe('Enable Anthropic prompt caching via cache_control breakpoints')
-    .optional(),
-
-
-  /**
-   * When `true`, enable the provider's web search tool/plugin for supported models.
-   *
-   * Provider-specific behaviour:
-   * - OpenAI          → adds `{ type: "web_search_preview" }` to `tools[]`
-   * - Anthropic        → adds `{ type: "web_search_20250305", ... }` to `tools[]`
-   * - Gemini           → enables `google_search` grounding tool
-   * - OpenRouter       → passes `plugins: [{ id: "web" }]` in `extra_body`
+   * Has no effect on models that do not expose a web search capability.
    */
   webSearchEnabled: z
     .boolean()
-    .describe('Enable web search tool for supported models')
-    .optional(),
-
-
-  /**
-   * When `true`, the `UserChoiceRouter` (backend#22) is allowed to fall back
-   * to the next available provider/key when the primary selection fails.
-   *
-   * Used by: `StreamOrchestrator` → `IProviderRouter.fallback()`
-   */
-  fallbackEnabled: z
-    .boolean()
-    .describe('Allow automatic provider fallback when the primary selection fails')
+    .describe('Enable web search tool for models that support it')
     .optional(),
 
 
@@ -242,8 +210,24 @@ export const settingSchemas = settingSchema.shape
 export type SettingKey = keyof typeof settingSchemas
 
 
+// ─── Wire DataType ────────────────────────────────────────────────────────────
+
+/**
+ * The wire representation of a setting value's data type.
+ *
+ * `json-object` and `json-array` are serialised as JSON strings on the wire
+ * but parsed into their structured forms by the service layer before consumers
+ * see them. Consumers should never receive the raw JSON string.
+ */
+export type SettingDataType = 'string' | 'number' | 'boolean' | 'json-object' | 'json-array'
+
+
 /**
  * Runtime metadata for each setting.
+ *
+ * Deliberately minimal: only runtime concerns live here.
+ * Validation constraints (min, max, etc.) are owned by `settingSchema` and
+ * derived in `getSettingDefinition()` — never duplicated here.
  *
  * Used by:
  * - Backend SettingsService - Determines encryption and defaults
@@ -254,134 +238,30 @@ export const settingMetadata: Record<
   {
     readonly category: string
     readonly encrypted: boolean
-    readonly dataType: 'string' | 'number' | 'boolean'
+    readonly dataType: SettingDataType
     readonly required: boolean
-    readonly minLength?: number
-    readonly maxLength?: number
-    readonly minValue?: number
-    readonly maxValue?: number
   }
 > = {
-  apiKeyOpenai: {
-    category: 'apiKey',
-    encrypted: true,
-    dataType: 'string',
-    minLength: 23,
-    required: false,
-  },
-  apiKeyAnthropic: {
-    category: 'apiKey',
-    encrypted: true,
-    dataType: 'string',
-    minLength: 100,
-    required: false,
-  },
-  apiKeyGoogle: {
-    category: 'apiKey',
-    encrypted: true,
-    dataType: 'string',
-    minLength: 35,
-    required: false,
-  },
-  apiKeyOpenrouter: {
-    category: 'apiKey',
-    encrypted: true,
-    dataType: 'string',
-    minLength: 20,
-    required: false,
-  },
-  openrouterBaseUrl: {
-    category: 'openrouter',
-    encrypted: false,
-    dataType: 'string',
-    required: false,
-  },
-  theme: {
-    category: 'ui',
-    encrypted: false,
-    dataType: 'string',
-    required: false,
-  },
-  promptInjectionMode: {
-    category: 'prompt',
-    encrypted: false,
-    dataType: 'string',
-    required: false,
-  },
-  promptInjectionInterval: {
-    category: 'prompt',
-    encrypted: false,
-    dataType: 'number',
-    required: false,
-    minValue: 1,
-    maxValue: 20,
-  },
-  promptInjectionPosition: {
-    category: 'prompt',
-    encrypted: false,
-    dataType: 'string',
-    required: false,
-  },
-  promptIncludeHistory: {
-    category: 'prompt',
-    encrypted: false,
-    dataType: 'boolean',
-    required: false,
-  },
-  modelTemperatures: {
-    category: 'model',
-    encrypted: false,
-    dataType: 'string', // serialised JSON object on the wire
-    required: false,
-  },
+  apiKeyOpenai:      { category: 'apiKey',  encrypted: true,  dataType: 'string',     required: false },
+  apiKeyAnthropic:   { category: 'apiKey',  encrypted: true,  dataType: 'string',     required: false },
+  apiKeyGoogle:      { category: 'apiKey',  encrypted: true,  dataType: 'string',     required: false },
+  apiKeyOpenrouter:  { category: 'apiKey',  encrypted: true,  dataType: 'string',     required: false },
+  openrouterBaseUrl: { category: 'apiKey',  encrypted: false, dataType: 'string',     required: false },
+  theme:             { category: 'ui',      encrypted: false, dataType: 'string',     required: false },
 
-  // ─── Reasoning ──────────────────────────────────────────────────────────────
+  promptInjectionMode:     { category: 'prompt', encrypted: false, dataType: 'string',     required: false },
+  promptInjectionInterval: { category: 'prompt', encrypted: false, dataType: 'number',     required: false },
+  promptInjectionPosition: { category: 'prompt', encrypted: false, dataType: 'string',     required: false },
+  promptIncludeHistory:    { category: 'prompt', encrypted: false, dataType: 'boolean',    required: false },
 
-  reasoningEffort: {
-    category: 'reasoning',
-    encrypted: false,
-    dataType: 'string',
-    required: false,
-  },
-  promptCachingEnabled: {
-    category: 'reasoning',
-    encrypted: false,
-    dataType: 'boolean',
-    required: false,
-  },
-  webSearchEnabled: {
-    category: 'reasoning',
-    encrypted: false,
-    dataType: 'boolean',
-    required: false,
-  },
-  fallbackEnabled: {
-    category: 'model',
-    encrypted: false,
-    dataType: 'boolean',
-    required: false,
-  },
+  modelTemperatures: { category: 'model', encrypted: false, dataType: 'json-object', required: false },
+  reasoningEffort:   { category: 'model', encrypted: false, dataType: 'string',      required: false },
+  webSearchEnabled:  { category: 'model', encrypted: false, dataType: 'boolean',     required: false },
 
   // ─── Ollama ────────────────────────────────────────────────────────────────
-
-  ollamaUrl: {
-    category: 'ollama',
-    encrypted: false,
-    dataType: 'string',
-    required: false,
-  },
-  ollamaModelDiscovery: {
-    category: 'ollama',
-    encrypted: false,
-    dataType: 'boolean',
-    required: false,
-  },
-  ollamaEnabledModels: {
-    category: 'ollama',
-    encrypted: false,
-    dataType: 'string', // serialised JSON array on the wire
-    required: false,
-  },
+  ollamaUrl:            { category: 'ollama', encrypted: false, dataType: 'string',     required: false },
+  ollamaModelDiscovery: { category: 'ollama', encrypted: false, dataType: 'boolean',    required: false },
+  ollamaEnabledModels:  { category: 'ollama', encrypted: false, dataType: 'json-array', required: false },
 } as const
 
 
@@ -395,7 +275,7 @@ export const settingMetadata: Record<
 export type UserSettingWithValidation = {
   readonly settingKey: string
   readonly settingValue: unknown
-  readonly dataType: 'string' | 'number' | 'boolean'
+  readonly dataType: SettingDataType
   readonly updatedAt: Date
   readonly category: string
   readonly encrypted: boolean
@@ -417,7 +297,7 @@ export type UserSettingWithValidation = {
 export const userSettingWithValidationSchema = /* @__PURE__ */ z.object({
   settingKey: z.string(),
   settingValue: z.unknown(),
-  dataType: z.enum(['string', 'number', 'boolean']),
+  dataType: z.enum(['string', 'number', 'boolean', 'json-object', 'json-array']),
   updatedAt: z.iso.datetime(),
   required: z.boolean(),
   minLength: z.number().optional(),
@@ -430,8 +310,55 @@ export const userSettingWithValidationSchema = /* @__PURE__ */ z.object({
 })
 
 
+// ─── Constraint extraction ────────────────────────────────────────────────────
+
+/**
+ * Walk a Zod schema's _def chain to extract string length and number range
+ * constraints. Works for optional wrappers, string, and number schemas.
+ *
+ * This is the single source of truth for min/max — NOT duplicated in metadata.
+ */
+/* @__NO_SIDE_EFFECTS__ */
+function extractConstraints(schema: z.ZodType): {
+  minLength?: number
+  maxLength?: number
+  minValue?: number
+  maxValue?: number
+} {
+  // Unwrap optional
+  const inner =
+    schema instanceof z.ZodOptional
+      ? (schema as z.ZodOptional<z.ZodType>).unwrap()
+      : schema
+
+  const result: {
+    minLength?: number
+    maxLength?: number
+    minValue?: number
+    maxValue?: number
+  } = {}
+
+  if (inner instanceof z.ZodString) {
+    for (const check of (inner as any)._def.checks ?? []) {
+      if (check.kind === 'min') result.minLength = check.value as number
+      if (check.kind === 'max') result.maxLength = check.value as number
+    }
+  } else if (inner instanceof z.ZodNumber) {
+    for (const check of (inner as any)._def.checks ?? []) {
+      if (check.kind === 'min') result.minValue = check.value as number
+      if (check.kind === 'max') result.maxValue = check.value as number
+    }
+  }
+
+  return result
+}
+
+
 /**
  * Get complete definition for a setting by key.
+ *
+ * Constraints (minLength, maxLength, minValue, maxValue) are derived from the
+ * Zod schema — never from settingMetadata — so they cannot drift.
  *
  * Used by:
  * - Backend SettingsService - Enriches DB records with metadata
@@ -451,11 +378,8 @@ export function getSettingDefinition(
     encrypted: metadata.encrypted,
     dataType: metadata.dataType,
     required: metadata.required,
-    description: (schema as { description?: string }).description ?? '',
-    minLength: metadata.minLength,
-    maxLength: metadata.maxLength,
-    minValue: metadata.minValue,
-    maxValue: metadata.maxValue,
+    description: schema.description ?? '',
+    ...extractConstraints(schema),
   }
 }
 
@@ -512,17 +436,6 @@ export const promptInjectionDefaults = {
 } as const
 
 
-// ─── Reasoning helpers ───────────────────────────────────────────────────────
-
-
-/** Typed alias for all valid reasoning effort levels. */
-export type ReasoningEffort = z.infer<typeof settingSchema.shape.reasoningEffort>
-
-
-/** Default reasoning effort when the setting is absent but reasoning is enabled. */
-export const defaultReasoningEffort: NonNullable<ReasoningEffort> = 'medium'
-
-
 // ─── Model temperature helpers ────────────────────────────────────────────────
 
 
@@ -574,6 +487,17 @@ export function resetModelTemperature(
   const { [modelValue]: _, ...rest } = temperatures ?? {}
   return rest
 }
+
+
+// ─── Reasoning helpers ───────────────────────────────────────────────────────
+
+
+/** Typed alias for the reasoningEffort setting value. */
+export type ReasoningEffort = NonNullable<z.infer<typeof settingSchema.shape.reasoningEffort>>
+
+
+/** Default reasoning effort when the setting is absent. */
+export const defaultReasoningEffort: ReasoningEffort = 'medium'
 
 
 // ─── Ollama helpers ──────────────────────────────────────────────────────────
