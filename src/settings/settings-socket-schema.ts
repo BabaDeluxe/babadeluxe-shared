@@ -192,7 +192,7 @@ export const settingSchema = /* @__PURE__ */ z.object({
     .describe('API key for the custom provider (may be empty for local endpoints)')
     .optional(),
 
-  // ─── Inference controls ────────────────────────────────────────────────────────
+  // ─── Inference controls ────────────────────────────────────────────────────
 
   /**
    * Reasoning effort level for models that support extended thinking.
@@ -234,6 +234,23 @@ export const settingSchema = /* @__PURE__ */ z.object({
   promptCachingEnabled: z
     .boolean()
     .describe('Enable Anthropic prompt caching (no-op for non-Anthropic models)')
+    .optional(),
+
+  /**
+   * When `true`, `UserChoiceRouter` will fall through to the next available
+   * provider if the primary provider stream errors or returns a non-retryable
+   * failure.
+   *
+   * Used by: backend#22 StreamOrchestrator / UserChoiceRouter.
+   * `resolve()` checks this flag on first attempt; `fallback()` is called on
+   * each subsequent retry regardless of this flag.
+   *
+   * Defaults to `false` on the backend when absent (fail fast, no silent
+   * provider switching without user opt-in).
+   */
+  fallbackEnabled: z
+    .boolean()
+    .describe('Fall back to the next available provider on stream error')
     .optional(),
 })
 
@@ -389,7 +406,7 @@ export const settingMetadata: Record<
     required: false,
   },
 
-  // ─── Inference controls ────────────────────────────────────────────────────────
+  // ─── Inference controls ────────────────────────────────────────────────────
 
   reasoningEffort: {
     category: 'inference',
@@ -404,6 +421,12 @@ export const settingMetadata: Record<
     required: false,
   },
   promptCachingEnabled: {
+    category: 'inference',
+    encrypted: false,
+    dataType: 'boolean',
+    required: false,
+  },
+  fallbackEnabled: {
     category: 'inference',
     encrypted: false,
     dataType: 'boolean',
@@ -581,7 +604,7 @@ export function resetModelTemperature(
 /** Typed alias for the ollamaEnabledModels setting value. */
 export type OllamaEnabledModels = string[]
 
-// ─── Inference control helpers ────────────────────────────────────────────────────
+// ─── Inference control helpers ────────────────────────────────────────────────
 
 /** Typed alias for all valid reasoning effort levels. */
 export type ReasoningEffort = NonNullable<z.infer<typeof settingSchema.shape.reasoningEffort>>
