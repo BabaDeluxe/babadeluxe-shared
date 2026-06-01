@@ -191,6 +191,50 @@ export const settingSchema = /* @__PURE__ */ z.object({
     .string()
     .describe('API key for the custom provider (may be empty for local endpoints)')
     .optional(),
+
+  // ─── Inference controls ────────────────────────────────────────────────────────
+
+  /**
+   * Reasoning effort level for models that support extended thinking.
+   *
+   * Supported by: OpenAI o-series, Anthropic Claude 3.7+, Gemini 2.0 Flash
+   * Thinking, DeepSeek R1, and the above via OpenRouter.
+   *
+   * OpenRouter unifies this as `reasoning.effort` in `extra_body`.
+   * Anthropic direct maps `high` → `thinking: { type: 'enabled', budget_tokens: 8000 }`.
+   *
+   * `off` disables reasoning even for models that default to it.
+   */
+  reasoningEffort: z
+    .enum(['off', 'minimal', 'low', 'medium', 'high'])
+    .describe('Reasoning effort level for thinking-capable models')
+    .optional(),
+
+  /**
+   * When `true`, enables web search grounding for supported models.
+   *
+   * - OpenAI: adds `tools: [{ type: 'web_search_preview' }]` to the request.
+   * - OpenRouter: adds `plugins: [{ id: 'web', max_results: 5 }]` in `extra_body`.
+   * - Anthropic direct: not supported — route via OpenRouter instead.
+   */
+  webSearchEnabled: z
+    .boolean()
+    .describe('Enable web search grounding for supported models')
+    .optional(),
+
+  /**
+   * When `true`, enables Anthropic prompt caching (`cache_control: { type: 'ephemeral' }`)
+   * on the system message and last user turn for Anthropic models.
+   *
+   * OpenAI caches automatically for prompts ≥1024 tokens — this flag has no
+   * effect for OpenAI models.
+   *
+   * Defaults to `true` on the backend when absent.
+   */
+  promptCachingEnabled: z
+    .boolean()
+    .describe('Enable Anthropic prompt caching (no-op for non-Anthropic models)')
+    .optional(),
 })
 
 /**
@@ -342,6 +386,27 @@ export const settingMetadata: Record<
     category: 'providers',
     encrypted: true,
     dataType: 'string',
+    required: false,
+  },
+
+  // ─── Inference controls ────────────────────────────────────────────────────────
+
+  reasoningEffort: {
+    category: 'inference',
+    encrypted: false,
+    dataType: 'string',
+    required: false,
+  },
+  webSearchEnabled: {
+    category: 'inference',
+    encrypted: false,
+    dataType: 'boolean',
+    required: false,
+  },
+  promptCachingEnabled: {
+    category: 'inference',
+    encrypted: false,
+    dataType: 'boolean',
     required: false,
   },
 } as const
@@ -515,3 +580,11 @@ export function resetModelTemperature(
 
 /** Typed alias for the ollamaEnabledModels setting value. */
 export type OllamaEnabledModels = string[]
+
+// ─── Inference control helpers ────────────────────────────────────────────────────
+
+/** Typed alias for all valid reasoning effort levels. */
+export type ReasoningEffort = NonNullable<z.infer<typeof settingSchema.shape.reasoningEffort>>
+
+/** Default reasoning effort used when the setting is absent. */
+export const defaultReasoningEffort: ReasoningEffort = 'medium'
