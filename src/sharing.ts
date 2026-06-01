@@ -5,7 +5,7 @@ export interface SharedLink {
   targetId: string
   ownerId: string
   collaborative: boolean
-  costCapUsd: number | null // required when collaborataive = true
+  costCapUsd: number | null // required when collaborative = true
   costSpentUsd: number
   expiresAt: string | null // null = permanent until reached
   revokedAt: string | null
