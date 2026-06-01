@@ -13,7 +13,9 @@
  * @module settings-schemas
  */
 
+
 import { z } from 'zod/v4'
+
 
 /**
  * Zod validation schema for all settings.
@@ -27,7 +29,30 @@ export const settingSchema = /* @__PURE__ */ z.object({
   apiKeyOpenai: z.string().min(23).describe('OpenAI API key for GPT models').optional(),
   apiKeyAnthropic: z.string().min(100).describe('Anthropic API key for Claude models').optional(),
   apiKeyGoogle: z.string().min(35).describe('Google Gemini API key').optional(),
+
+  /**
+   * OpenRouter API key.
+   * Used by: babadeluxe-backend#18
+   */
+  apiKeyOpenrouter: z
+    .string()
+    .min(1)
+    .describe('OpenRouter API key')
+    .optional(),
+
+  /**
+   * Optional custom OpenRouter base URL override.
+   * Defaults to `https://openrouter.ai/api/v1` if absent.
+   * Used by: babadeluxe-backend#18
+   */
+  openrouterBaseUrl: z
+    .string()
+    .url()
+    .describe('Custom OpenRouter base URL (defaults to https://openrouter.ai/api/v1)')
+    .optional(),
+
   theme: z.enum(['dark', 'light']).describe('UI theme').optional(),
+
 
   /**
    * Determines when the system prompt is appended during a conversation.
@@ -43,6 +68,7 @@ export const settingSchema = /* @__PURE__ */ z.object({
     .describe('When to append the system prompt during a conversation')
     .optional(),
 
+
   /**
    * Number of messages between automatic re-injections.
    * Only used when `promptInjectionMode` is `every-x-messages`.
@@ -56,6 +82,7 @@ export const settingSchema = /* @__PURE__ */ z.object({
     .describe('Message interval for every-x-messages injection mode')
     .optional(),
 
+
   /**
    * Where the prompt is injected in the message array.
    *
@@ -68,6 +95,7 @@ export const settingSchema = /* @__PURE__ */ z.object({
     .describe('Where to inject the prompt relative to the message array')
     .optional(),
 
+
   /**
    * Whether to re-include prior conversation history when re-injecting the prompt
    * mid-conversation (relevant for `every-x-messages` and `on-prompt-change` modes).
@@ -76,6 +104,7 @@ export const settingSchema = /* @__PURE__ */ z.object({
     .boolean()
     .describe('Re-include conversation history when re-injecting the prompt')
     .optional(),
+
 
   /**
    * Per-model temperature overrides stored as a JSON object.
@@ -96,7 +125,64 @@ export const settingSchema = /* @__PURE__ */ z.object({
     .describe('Per-model temperature overrides (model value → 0–2 float)')
     .optional(),
 
+
+  // ─── Reasoning ────────────────────────────────────────────────────────────
+
+
+  /**
+   * Per-model reasoning effort overrides stored as a JSON object.
+   *
+   * Keys are model value strings. Values are one of `"low" | "medium" | "high"`.
+   * Applies to models that support extended thinking / reasoning mode:
+   * - OpenAI o-series: maps to `reasoning_effort`
+   * - Anthropic Claude 3.5/3.7 thinking: maps to `budget_tokens` (low=1024, medium=8192, high=32768)
+   * - DeepSeek R1 / Gemini Flash Thinking: handled per-provider
+   *
+   * Stored as a JSON string on the wire; parsed on read.
+   * When a model key is absent, the provider default is used (no extended reasoning).
+   *
+   * Used by: babadeluxe-backend#19
+   */
+  reasoningEffort: z
+    .record(z.string(), z.enum(['low', 'medium', 'high']))
+    .describe('Per-model reasoning effort overrides (model value → low | medium | high)')
+    .optional(),
+
+
+  // ─── Web search ────────────────────────────────────────────────────────────
+
+
+  /**
+   * When `true`, the backend injects the provider's native web-search tool
+   * for the current request (OpenAI `web_search_preview`, Anthropic
+   * `web_search_20250305`).
+   *
+   * Used by: babadeluxe-backend#26
+   */
+  webSearchEnabled: z
+    .boolean()
+    .describe('Enable provider-native web search for supported models')
+    .optional(),
+
+
+  // ─── Prompt caching ────────────────────────────────────────────────────────
+
+
+  /**
+   * When `true`, the backend adds `cache_control: { type: "ephemeral" }` breakpoints
+   * to Anthropic requests for prompt-caching savings.
+   * No-op for non-Anthropic providers.
+   *
+   * Used by: babadeluxe-shared#10 (future)
+   */
+  promptCachingEnabled: z
+    .boolean()
+    .describe('Enable Anthropic prompt caching (cache_control breakpoints)')
+    .optional(),
+
+
   // ─── Ollama ────────────────────────────────────────────────────────────────
+
 
   /**
    * Base URL of the local Ollama instance (e.g. `"http://localhost:11434"`).
@@ -108,6 +194,7 @@ export const settingSchema = /* @__PURE__ */ z.object({
     .describe('Base URL of the local Ollama instance')
     .optional(),
 
+
   /**
    * When `true`, the UI polls `models:listOllamaModels` to discover available
    * models from the running Ollama instance.
@@ -116,6 +203,7 @@ export const settingSchema = /* @__PURE__ */ z.object({
     .boolean()
     .describe('Enable automatic discovery of models from the Ollama instance')
     .optional(),
+
 
   /**
    * Allowlist of Ollama model names that should appear in the model selector.
@@ -129,123 +217,20 @@ export const settingSchema = /* @__PURE__ */ z.object({
     .array(z.string())
     .describe('Allowlist of Ollama model names shown in the model selector')
     .optional(),
-
-  // ─── Providers ─────────────────────────────────────────────────────────────
-
-  /**
-   * OpenRouter API key.
-   * Routes requests through openrouter.ai — single key for 300+ models.
-   * Min length 20 to catch obvious garbage; full format is `sk-or-v1-…`.
-   */
-  apiKeyOpenrouter: z
-    .string()
-    .min(20)
-    .describe('OpenRouter API key (sk-or-v1-…)')
-    .optional(),
-
-  /**
-   * OpenRouter base URL.
-   * Defaults to `https://openrouter.ai/api/v1` in the backend resolveProvider().
-   * Override only if routing through a proxy.
-   */
-  openrouterBaseUrl: z
-    .string()
-    .url()
-    .describe('OpenRouter base URL (default: https://openrouter.ai/api/v1)')
-    .optional(),
-
-  /**
-   * When `true`, the backend routes requests through the custom provider
-   * defined by `customProviderBaseUrl` and `customProviderApiKey`.
-   */
-  customProviderEnabled: z
-    .boolean()
-    .describe('Route requests through the custom OpenAI-compatible provider')
-    .optional(),
-
-  /**
-   * Display label for the custom provider shown in the UI (e.g. `"LM Studio"`).
-   * Max 32 characters.
-   */
-  customProviderName: z
-    .string()
-    .max(32)
-    .describe('Display name for the custom provider (e.g. LM Studio)')
-    .optional(),
-
-  /**
-   * Base URL of the custom OpenAI-compatible endpoint.
-   * Examples: `http://localhost:1234/v1` (LM Studio), `https://api.groq.com/openai/v1`.
-   */
-  customProviderBaseUrl: z
-    .string()
-    .url()
-    .describe('Base URL of the custom OpenAI-compatible endpoint')
-    .optional(),
-
-  /**
-   * API key for the custom provider.
-   * May be an empty string for local providers that do not require authentication.
-   */
-  customProviderApiKey: z
-    .string()
-    .describe('API key for the custom provider (may be empty for local endpoints)')
-    .optional(),
-
-  // ─── Inference controls ────────────────────────────────────────────────────────
-
-  /**
-   * Reasoning effort level for models that support extended thinking.
-   *
-   * Supported by: OpenAI o-series, Anthropic Claude 3.7+, Gemini 2.0 Flash
-   * Thinking, DeepSeek R1, and the above via OpenRouter.
-   *
-   * OpenRouter unifies this as `reasoning.effort` in `extra_body`.
-   * Anthropic direct maps `high` → `thinking: { type: 'enabled', budget_tokens: 8000 }`.
-   *
-   * `off` disables reasoning even for models that default to it.
-   */
-  reasoningEffort: z
-    .enum(['off', 'minimal', 'low', 'medium', 'high'])
-    .describe('Reasoning effort level for thinking-capable models')
-    .optional(),
-
-  /**
-   * When `true`, enables web search grounding for supported models.
-   *
-   * - OpenAI: adds `tools: [{ type: 'web_search_preview' }]` to the request.
-   * - OpenRouter: adds `plugins: [{ id: 'web', max_results: 5 }]` in `extra_body`.
-   * - Anthropic direct: not supported — route via OpenRouter instead.
-   */
-  webSearchEnabled: z
-    .boolean()
-    .describe('Enable web search grounding for supported models')
-    .optional(),
-
-  /**
-   * When `true`, enables Anthropic prompt caching (`cache_control: { type: 'ephemeral' }`)
-   * on the system message and last user turn for Anthropic models.
-   *
-   * OpenAI caches automatically for prompts ≥1024 tokens — this flag has no
-   * effect for OpenAI models.
-   *
-   * Defaults to `true` on the backend when absent.
-   */
-  promptCachingEnabled: z
-    .boolean()
-    .describe('Enable Anthropic prompt caching (no-op for non-Anthropic models)')
-    .optional(),
 })
+
 
 /**
  * Record of per-key schemas (for the "map of schemas" philosophy).
  */
 export const settingSchemas = settingSchema.shape
 
+
 /**
  * Union type of all valid setting keys.
  */
-type SettingKey = keyof typeof settingSchemas
+export type SettingKey = keyof typeof settingSchemas
+
 
 /**
  * Runtime metadata for each setting.
@@ -259,7 +244,7 @@ export const settingMetadata: Record<
   {
     readonly category: string
     readonly encrypted: boolean
-    readonly dataType: 'string' | 'number' | 'boolean'
+    readonly dataType: 'string' | 'number' | 'boolean' | 'json-object' | 'json-array'
     readonly required: boolean
     readonly minLength?: number
     readonly maxLength?: number
@@ -286,6 +271,19 @@ export const settingMetadata: Record<
     encrypted: true,
     dataType: 'string',
     minLength: 35,
+    required: false,
+  },
+  apiKeyOpenrouter: {
+    category: 'apiKey',
+    encrypted: true,
+    dataType: 'string',
+    minLength: 1,
+    required: false,
+  },
+  openrouterBaseUrl: {
+    category: 'openrouter',
+    encrypted: false,
+    dataType: 'string',
     required: false,
   },
   theme: {
@@ -323,11 +321,31 @@ export const settingMetadata: Record<
   modelTemperatures: {
     category: 'model',
     encrypted: false,
-    dataType: 'string', // serialised JSON object on the wire
+    dataType: 'json-object',
+    required: false,
+  },
+  reasoningEffort: {
+    category: 'model',
+    encrypted: false,
+    dataType: 'json-object',
+    required: false,
+  },
+  webSearchEnabled: {
+    category: 'model',
+    encrypted: false,
+    dataType: 'boolean',
+    required: false,
+  },
+  promptCachingEnabled: {
+    category: 'prompt',
+    encrypted: false,
+    dataType: 'boolean',
     required: false,
   },
 
+
   // ─── Ollama ────────────────────────────────────────────────────────────────
+
 
   ollamaUrl: {
     category: 'ollama',
@@ -344,72 +362,11 @@ export const settingMetadata: Record<
   ollamaEnabledModels: {
     category: 'ollama',
     encrypted: false,
-    dataType: 'string', // serialised JSON array on the wire
-    required: false,
-  },
-
-  // ─── Providers ─────────────────────────────────────────────────────────────
-
-  apiKeyOpenrouter: {
-    category: 'providers',
-    encrypted: true,
-    dataType: 'string',
-    minLength: 20,
-    required: false,
-  },
-  openrouterBaseUrl: {
-    category: 'providers',
-    encrypted: false,
-    dataType: 'string',
-    required: false,
-  },
-  customProviderEnabled: {
-    category: 'providers',
-    encrypted: false,
-    dataType: 'boolean',
-    required: false,
-  },
-  customProviderName: {
-    category: 'providers',
-    encrypted: false,
-    dataType: 'string',
-    maxLength: 32,
-    required: false,
-  },
-  customProviderBaseUrl: {
-    category: 'providers',
-    encrypted: false,
-    dataType: 'string',
-    required: false,
-  },
-  customProviderApiKey: {
-    category: 'providers',
-    encrypted: true,
-    dataType: 'string',
-    required: false,
-  },
-
-  // ─── Inference controls ────────────────────────────────────────────────────────
-
-  reasoningEffort: {
-    category: 'inference',
-    encrypted: false,
-    dataType: 'string',
-    required: false,
-  },
-  webSearchEnabled: {
-    category: 'inference',
-    encrypted: false,
-    dataType: 'boolean',
-    required: false,
-  },
-  promptCachingEnabled: {
-    category: 'inference',
-    encrypted: false,
-    dataType: 'boolean',
+    dataType: 'json-array',
     required: false,
   },
 } as const
+
 
 /**
  * TypeScript type for user settings with validation metadata.
@@ -421,7 +378,7 @@ export const settingMetadata: Record<
 export type UserSettingWithValidation = {
   readonly settingKey: string
   readonly settingValue: unknown
-  readonly dataType: 'string' | 'number' | 'boolean'
+  readonly dataType: 'string' | 'number' | 'boolean' | 'json-object' | 'json-array'
   readonly updatedAt: Date
   readonly category: string
   readonly encrypted: boolean
@@ -433,6 +390,7 @@ export type UserSettingWithValidation = {
   readonly maxValue?: number
 }
 
+
 /**
  * Zod schema for socket.io wire format validation.
  *
@@ -442,7 +400,7 @@ export type UserSettingWithValidation = {
 export const userSettingWithValidationSchema = /* @__PURE__ */ z.object({
   settingKey: z.string(),
   settingValue: z.unknown(),
-  dataType: z.enum(['string', 'number', 'boolean']),
+  dataType: z.enum(['string', 'number', 'boolean', 'json-object', 'json-array']),
   updatedAt: z.iso.datetime(),
   required: z.boolean(),
   minLength: z.number().optional(),
@@ -453,6 +411,7 @@ export const userSettingWithValidationSchema = /* @__PURE__ */ z.object({
   category: z.string(),
   encrypted: z.boolean(),
 })
+
 
 /**
  * Get complete definition for a setting by key.
@@ -475,13 +434,14 @@ export function getSettingDefinition(
     encrypted: metadata.encrypted,
     dataType: metadata.dataType,
     required: metadata.required,
-    description: (schema as { description?: string }).description ?? '',
+    description: schema.description ?? '',
     minLength: metadata.minLength,
     maxLength: metadata.maxLength,
     minValue: metadata.minValue,
     maxValue: metadata.maxValue,
   }
 }
+
 
 /**
  * Validate a setting value against its schema.
@@ -506,6 +466,7 @@ export function validateSetting(key: string, value: unknown) {
       }
 }
 
+
 /**
  * Wire-safe type for socket transmission (Date → ISO string)
  */
@@ -513,13 +474,17 @@ export type UserSettingWire = Omit<UserSettingWithValidation, 'updatedAt'> & {
   readonly updatedAt: string
 }
 
+
 // ─── Prompt injection helpers ────────────────────────────────────────────────
+
 
 /** Typed alias for all valid injection modes. */
 export type PromptInjectionMode = z.infer<typeof settingSchema.shape.promptInjectionMode>
 
+
 /** Typed alias for all valid injection positions. */
 export type PromptInjectionPosition = z.infer<typeof settingSchema.shape.promptInjectionPosition>
+
 
 /** Default values used when a setting is absent. */
 export const promptInjectionDefaults = {
@@ -529,13 +494,17 @@ export const promptInjectionDefaults = {
   includeHistory: true,
 } as const
 
+
 // ─── Model temperature helpers ────────────────────────────────────────────────
+
 
 /** Shape of the modelTemperatures setting value. */
 export type ModelTemperatures = Record<string, number>
 
+
 /** Provider default temperature used when no override exists. */
 export const defaultTemperature = 1
+
 
 /**
  * Get the temperature for a specific model, falling back to the provider default.
@@ -552,6 +521,7 @@ export function getModelTemperature(
   return temperatures?.[modelValue] ?? defaultTemperature
 }
 
+
 /**
  * Set the temperature for a specific model, returning a new object (immutable).
  */
@@ -563,6 +533,7 @@ export function setModelTemperature(
 ): ModelTemperatures {
   return { ...temperatures, [modelValue]: value }
 }
+
 
 /**
  * Remove the temperature override for a specific model (reset to default).
@@ -576,15 +547,63 @@ export function resetModelTemperature(
   return rest
 }
 
+
+// ─── Reasoning effort helpers ─────────────────────────────────────────────────
+
+
+/** Valid reasoning effort levels. */
+export type ReasoningEffortLevel = 'low' | 'medium' | 'high'
+
+
+/** Shape of the reasoningEffort setting value. */
+export type ReasoningEffortMap = Record<string, ReasoningEffortLevel>
+
+
+/**
+ * Get the reasoning effort for a specific model, returning `undefined` when
+ * no override is set (provider default = no extended reasoning).
+ *
+ * @example
+ * getReasoningEffort({ 'claude-opus-4-5': 'high' }, 'claude-opus-4-5') // 'high'
+ * getReasoningEffort({ 'claude-opus-4-5': 'high' }, 'gpt-4o')          // undefined
+ */
+/* @__NO_SIDE_EFFECTS__ */
+export function getReasoningEffort(
+  efforts: ReasoningEffortMap | undefined,
+  modelValue: string
+): ReasoningEffortLevel | undefined {
+  return efforts?.[modelValue]
+}
+
+
+/**
+ * Set the reasoning effort for a specific model, returning a new object (immutable).
+ */
+/* @__NO_SIDE_EFFECTS__ */
+export function setReasoningEffort(
+  efforts: ReasoningEffortMap | undefined,
+  modelValue: string,
+  level: ReasoningEffortLevel
+): ReasoningEffortMap {
+  return { ...efforts, [modelValue]: level }
+}
+
+
+/**
+ * Remove the reasoning effort override for a specific model.
+ */
+/* @__NO_SIDE_EFFECTS__ */
+export function resetReasoningEffort(
+  efforts: ReasoningEffortMap | undefined,
+  modelValue: string
+): ReasoningEffortMap {
+  const { [modelValue]: _, ...rest } = efforts ?? {}
+  return rest
+}
+
+
 // ─── Ollama helpers ──────────────────────────────────────────────────────────
+
 
 /** Typed alias for the ollamaEnabledModels setting value. */
 export type OllamaEnabledModels = string[]
-
-// ─── Inference control helpers ────────────────────────────────────────────────────
-
-/** Typed alias for all valid reasoning effort levels. */
-export type ReasoningEffort = NonNullable<z.infer<typeof settingSchema.shape.reasoningEffort>>
-
-/** Default reasoning effort used when the setting is absent. */
-export const defaultReasoningEffort: ReasoningEffort = 'medium'
