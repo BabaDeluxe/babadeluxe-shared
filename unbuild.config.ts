@@ -79,7 +79,7 @@ export default defineBuildConfig({
     esbuild: {
       minify: false,
       keepNames: true,
-    }
+    },
   },
 
   clean: true,
