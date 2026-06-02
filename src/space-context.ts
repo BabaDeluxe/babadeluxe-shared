@@ -1,4 +1,4 @@
-export interface SpaceAnswerEmbedding {
+export type SpaceAnswerEmbedding = {
   answerId: string
   spaceId: string
   query: string
@@ -7,6 +7,6 @@ export interface SpaceAnswerEmbedding {
   embedding: number[]
 }
 
-export interface SpaceContextBlock {
-  answers: Array<{query: string; answer: string}>
+export type SpaceContextBlock = {
+  answers: Array<{ query: string; answer: string }>
 }

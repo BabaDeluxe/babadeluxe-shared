@@ -1,5 +1,3 @@
-import type { ModelId } from './generated-socket-types/socket-types'
-
 // ─── Battle Mode payload types ───────────────────────────────────────────────
 // Linked to: babadeluxe-webview#117, babadeluxe-backend#34
 
@@ -13,7 +11,7 @@ export type ContextItem = {
 
 export type BattleStartPayload = {
   messageId: string
-  models: [ModelId, ModelId]
+  models: [string, string]
   content: string
   context: ContextItem[]
 }
@@ -22,17 +20,17 @@ export type BattleStartPayload = {
 
 export type BattleChunkPayload = {
   messageId: string
-  modelId: ModelId
+  modelId: string
   chunk: string
 }
 
 export type BattleDonePayload = {
   messageId: string
-  modelId: ModelId
+  modelId: string
 }
 
 export type BattleErrorPayload = {
   messageId: string
-  modelId: ModelId
+  modelId: string
   error: string
 }

@@ -21,6 +21,11 @@ export namespace Root {
             chunk: string;
             sequence: number;
         }) => void;
+        "chat:reasoningChunk": (p1: {
+            messageId: number;
+            chunk: string;
+            sequence: number;
+        }) => void;
         "chat:messageComplete": (p1: {
             messageId: number;
             fullContent: string;
@@ -206,6 +211,7 @@ export namespace Root {
                 description?: string | undefined;
                 isActive: boolean;
                 isSystem: boolean;
+                isPremium: boolean;
                 createdAt: string;
                 updatedAt: string;
             }[];
@@ -219,6 +225,7 @@ export namespace Root {
                 description?: string | undefined;
                 isActive: boolean;
                 isSystem: boolean;
+                isPremium: boolean;
                 createdAt: string;
                 updatedAt: string;
             }[];

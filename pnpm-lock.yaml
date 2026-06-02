@@ -15,14 +15,14 @@ importers:
         specifier: ^8.2.0
         version: 8.2.0
       socket.io-client:
-        specifier: ^4.7.4
+        specifier: ^4.8.3
         version: 4.8.3
       zod:
-        specifier: ^4.1.12
-        version: 4.3.6
+        specifier: ^4.4.3
+        version: 4.4.3
       zod-sockets:
-        specifier: ^5.0.0
-        version: 5.2.0(socket.io@4.8.3)(typescript@5.9.3)(zod@4.3.6)
+        specifier: ^5.3.0
+        version: 5.3.0(socket.io@4.8.3)(typescript@5.9.3)(zod@4.4.3)
     devDependencies:
       '@babadeluxe/xo-config':
         specifier: ^0.4.10
@@ -55,7 +55,7 @@ importers:
         specifier: ^4.20.5
         version: 4.21.0
       typescript:
-        specifier: ^5.9.2
+        specifier: ^5.9.3
         version: 5.9.3
       unbuild:
         specifier: ^3.6.1
@@ -3047,16 +3047,16 @@ packages:
     resolution: {integrity: sha512-CzhO+pFNo8ajLM2d2IW/R93ipy99LWjtwblvC1RsoSUMZgyLbYFr221TnSNT7GjGdYui6P459mw9JH/g/zW2ug==}
     engines: {node: '>=18'}
 
-  zod-sockets@5.2.0:
-    resolution: {integrity: sha512-QVRvEIcvVsfgnlxvUQn1s00V5LP+/oTlEy0c/wfGVtsymMD3IPIkpc3np0Ialj/Qqd49sqL0zsNlZEXKvFkbCw==}
-    engines: {node: ^20.19.0 || ^22.12.0 || ^24.0.0}
+  zod-sockets@5.3.0:
+    resolution: {integrity: sha512-tsvaKY6gJuBD1v4J0/7s0sTJSvFNLVolezfdMXidWaSfQMTBuAeP1GVgZrmYDPuVKiIGFZgCeB8SO1oACWEQPQ==}
+    engines: {node: ^20.19.0 || ^22.12.0 || ^24.0.0 || ^26.0.0}
     peerDependencies:
       socket.io: ^4.7.4
       typescript: ^5.3.3 || ^6.0.2
       zod: ^4.1.0
 
-  zod@4.3.6:
-    resolution: {integrity: sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==}
+  zod@4.4.3:
+    resolution: {integrity: sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ==}
 
 snapshots:
 
@@ -6219,13 +6219,13 @@ snapshots:
 
   yoctocolors@2.1.2: {}
 
-  zod-sockets@5.2.0(socket.io@4.8.3)(typescript@5.9.3)(zod@4.3.6):
+  zod-sockets@5.3.0(socket.io@4.8.3)(typescript@5.9.3)(zod@4.4.3):
     dependencies:
       ansis: 4.2.0
       ramda: 0.32.0
       socket.io: 4.8.3
       typescript: 5.9.3
       yaml: 2.8.3
-      zod: 4.3.6
+      zod: 4.4.3
 
-  zod@4.3.6: {}
+  zod@4.4.3: {}
