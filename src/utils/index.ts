@@ -3,5 +3,6 @@
  */
 
 export * from './base-error'
+export * from './dag-prompt-builder'
 export * from './damerau-levenshtein'
 export * from './safe-json-parse'
