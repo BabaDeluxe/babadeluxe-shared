@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { describe, expect, it } from 'vitest'
 import { DagPromptBuilder, DagPromptBuilderError } from './dag-prompt-builder.js'
 
@@ -14,7 +15,7 @@ describe('DagPromptBuilder', () => {
     builder.addNode({
       id: 'user',
       dependsOn: ['system'],
-      render: (deps) => `${deps.system} Now answer: What is 2+2?`,
+      render: (deps) => `${deps['system']} Now answer: What is 2+2?`,
     })
     const result = builder.build()
     expect(result).toBe('You are helpful.\nYou are helpful. Now answer: What is 2+2?')
@@ -23,9 +24,29 @@ describe('DagPromptBuilder', () => {
   it('resolves a chain of three nodes in correct order', () => {
     const order: string[] = []
     const builder = new DagPromptBuilder()
-    builder.addNode({ id: 'a', render: () => { order.push('a'); return 'A' } })
-    builder.addNode({ id: 'b', dependsOn: ['a'], render: () => { order.push('b'); return 'B' } })
-    builder.addNode({ id: 'c', dependsOn: ['b'], render: () => { order.push('c'); return 'C' } })
+    builder.addNode({
+      id: 'a',
+      render() {
+        order.push('a')
+        return 'A'
+      },
+    })
+    builder.addNode({
+      id: 'b',
+      dependsOn: ['a'],
+      render() {
+        order.push('b')
+        return 'B'
+      },
+    })
+    builder.addNode({
+      id: 'c',
+      dependsOn: ['b'],
+      render() {
+        order.push('c')
+        return 'C'
+      },
+    })
     builder.build()
     expect(order).toEqual(['a', 'b', 'c'])
   })
@@ -33,9 +54,9 @@ describe('DagPromptBuilder', () => {
   it('handles a diamond dependency (a→b, a→c, b+c→d)', () => {
     const builder = new DagPromptBuilder()
     builder.addNode({ id: 'a', render: () => 'root' })
-    builder.addNode({ id: 'b', dependsOn: ['a'], render: (d) => `b(${d.a})` })
-    builder.addNode({ id: 'c', dependsOn: ['a'], render: (d) => `c(${d.a})` })
-    builder.addNode({ id: 'd', dependsOn: ['b', 'c'], render: (d) => `d(${d.b}+${d.c})` })
+    builder.addNode({ id: 'b', dependsOn: ['a'], render: (d) => `b(${d['a']})` })
+    builder.addNode({ id: 'c', dependsOn: ['a'], render: (d) => `c(${d['a']})` })
+    builder.addNode({ id: 'd', dependsOn: ['b', 'c'], render: (d) => `d(${d['b']}+${d['c']})` })
     const result = builder.build(' | ')
     expect(result).toContain('d(b(root)+c(root))')
   })
@@ -62,9 +83,7 @@ describe('DagPromptBuilder', () => {
   it('throws on a direct cycle (a→b→a)', () => {
     const builder = new DagPromptBuilder()
     // Manually bypass addNode duplicate guard to plant the cycle
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ;(builder as any)._nodes.set('a', { id: 'a', dependsOn: ['b'], render: () => 'A' })
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ;(builder as any)._nodes.set('b', { id: 'b', dependsOn: ['a'], render: () => 'B' })
     expect(() => builder.build()).toThrow('Cycle detected')
   })

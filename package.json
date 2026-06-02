@@ -53,6 +53,7 @@
     "format": "xo --fix --prettier *.ts",
     "generate-barrels": "barrelsby --config ./.barrelsby.json",
     "build": "unbuild",
+    "test": "vitest",
     "type-check": "tsc --noEmit",
     "test-package": "pnpm build && pnpm pack --dry-run",
     "publish-patch": "tsx ./publish.ts patch",
@@ -80,6 +81,7 @@
     "tsx": "^4.20.5",
     "typescript": "^5.9.3",
     "unbuild": "^3.6.1",
+    "vitest": "^4.1.8",
     "xo": "1.2.2"
   },
   "publishConfig": {
