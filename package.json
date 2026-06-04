@@ -32,6 +32,36 @@
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
     },
+    "./battle": {
+      "types": "./dist/battle.d.ts",
+      "import": "./dist/battle.mjs",
+      "require": "./dist/battle.cjs"
+    },
+    "./chat": {
+      "types": "./dist/chat.d.ts",
+      "import": "./dist/chat.mjs",
+      "require": "./dist/chat.cjs"
+    },
+    "./cost": {
+      "types": "./dist/cost.d.ts",
+      "import": "./dist/cost.mjs",
+      "require": "./dist/cost.cjs"
+    },
+    "./sharing": {
+      "types": "./dist/sharing.d.ts",
+      "import": "./dist/sharing.mjs",
+      "require": "./dist/sharing.cjs"
+    },
+    "./space-context": {
+      "types": "./dist/space-context.d.ts",
+      "import": "./dist/space-context.mjs",
+      "require": "./dist/space-context.cjs"
+    },
+    "./tts": {
+      "types": "./dist/tts.d.ts",
+      "import": "./dist/tts.mjs",
+      "require": "./dist/tts.cjs"
+    },
     "./generated-socket-types": {
       "types": "./dist/generated-socket-types/index.d.ts",
       "import": "./dist/generated-socket-types/index.mjs",
@@ -41,6 +71,11 @@
       "types": "./dist/settings/index.d.ts",
       "import": "./dist/settings/index.mjs",
       "require": "./dist/settings/index.cjs"
+    },
+    "./settings/schema": {
+      "types": "./dist/settings/settings-socket-schema.d.ts",
+      "import": "./dist/settings/settings-socket-schema.mjs",
+      "require": "./dist/settings/settings-socket-schema.cjs"
     },
     "./utils": {
       "types": "./dist/utils/index.d.ts",

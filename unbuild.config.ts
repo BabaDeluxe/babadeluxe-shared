@@ -27,9 +27,12 @@ const toSrcDir = (exportTarget: PackageJsonExportsTarget): string => {
     throw new Error('Export target without import/require/types is not supported for mkdist')
   }
 
-  const dirFromDist = path.dirname(importPath) // ./dist/utils
-  const relativeDir = dirFromDist.replace(/^\.\/dist/, './src')
-  return relativeDir
+  const fileFromDist = importPath.replace(/^\.\/dist/, './src')
+  const dirFromDist = path.dirname(fileFromDist)
+
+  // If it points directly to a file that exists (with .ts extension), we use that directory
+  // But mkdist works on directories, so we return the directory.
+  return dirFromDist
 }
 
 const toOutDir = (exportTarget: PackageJsonExportsTarget): string => {
@@ -46,26 +49,64 @@ const createMkdistEntriesFromExports = (): MkdistBuildEntry[] => {
     return []
   }
 
-  return Object.entries(packageJson.exports)
-    .filter(([key]) => isSubpathKey(key))
-    .map(([, target]) => ({
-      builder: 'mkdist',
-      input: toSrcDir(target),
-      outDir: toOutDir(target),
-      format: 'esm',
-    }))
+  const entries: MkdistBuildEntry[] = []
+  const processedDirs = new Set<string>()
+
+  for (const [key, target] of Object.entries(packageJson.exports)) {
+    if (isSubpathKey(key)) {
+      const srcDir = toSrcDir(target)
+      const outDir = toOutDir(target)
+      const dirKey = `${srcDir}->${outDir}`
+
+      if (processedDirs.has(dirKey)) continue
+      processedDirs.add(dirKey)
+
+      // Add ESM entry
+      entries.push({
+        builder: 'mkdist',
+        input: srcDir,
+        outDir,
+        format: 'esm',
+        ext: 'mjs',
+        declaration: true,
+      })
+
+      // Add CJS entry
+      entries.push({
+        builder: 'mkdist',
+        input: srcDir,
+        outDir,
+        format: 'cjs',
+        ext: 'cjs',
+        declaration: false,
+      })
+    }
+  }
+
+  return entries
 }
 
 const mkdistEntries = createMkdistEntriesFromExports()
 
 export default defineBuildConfig({
   entries: [
-    // Main entry: mkdist the whole src so everything stays modular
+    // Main entry ESM
     {
       builder: 'mkdist',
       input: './src',
       outDir: './dist',
       format: 'esm',
+      ext: 'mjs',
+      declaration: true,
+    },
+    // Main entry CJS
+    {
+      builder: 'mkdist',
+      input: './src',
+      outDir: './dist',
+      format: 'cjs',
+      ext: 'cjs',
+      declaration: false,
     },
     ...mkdistEntries,
   ],
