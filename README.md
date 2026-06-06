@@ -10,19 +10,28 @@
   <img src="https://img.shields.io/badge/node-%3E%3D20.19%20%3C24-b06ab3?style=flat-rounded" alt="node version">
 </p>
 
-> **Shared types, Zod schemas, and utilities used across the BabaDeluxe ecosystem.** If it needs to be consistent between the extension, webview, and backend — it lives here.
+> **The architectural bedrock of the BabaDeluxe AI ecosystem.** Providing the foundational types, schemas, and cognitive utilities that power the future of autonomous software engineering.
 
 ## Overview
 
-This package is the single source of truth for cross-cutting concerns in BabaDeluxe. It provides end-to-end type safety between the VS Code extension, the Vue webview, and the backend — no duplicated type definitions, no schema drift.
+### Why?
+
+In a complex distributed system like BabaDeluxe, maintaining consistency between the VS Code extension, the Vue-based webview, and the high-performance backend is paramount. `@babadeluxe/shared` eliminates schema drift and duplication, ensuring a unified "shared consciousness" across all components of the AI assistant.
 
 ## Entry Points
 
 | Import                                      | Contents                                                           |
 | :------------------------------------------ | :----------------------------------------------------------------- |
-| `@babadeluxe/shared`                        | Main entry point — re-exports all sub-modules                      |
+| `@babadeluxe/shared`                        | Unified entry point — re-exports all cognitive sub-modules         |
+| `@babadeluxe/shared/battle`                 | Payloads for Battle Mode model comparisons                         |
+| `@babadeluxe/shared/chat`                   | Core message and conversation types (including reasoning chunks)   |
+| `@babadeluxe/shared/cost`                   | Token usage and pricing models for AI inference                    |
+| `@babadeluxe/shared/sharing`                | Collaborative link and conversation forking logic                  |
+| `@babadeluxe/shared/space-context`          | Vector-ready context blocks and embedding structures               |
+| `@babadeluxe/shared/tts`                    | Text-to-speech provider interfaces and options                     |
 | `@babadeluxe/shared/generated-socket-types` | Auto-generated TypeScript interfaces for Socket.io events          |
 | `@babadeluxe/shared/settings`               | User configuration schema, validation, and metadata                |
+| `@babadeluxe/shared/settings/schema`        | Low-level Zod schemas for settings validation                      |
 | `@babadeluxe/shared/utils`                  | General utilities: Damerau-Levenshtein distance, safe JSON parsing |
 
 ## Installation
@@ -80,13 +89,17 @@ console.log(score) // 0.833... (high similarity due to transposition)
 
 ## Contributor Setup
 
-This package uses a custom npm registry. To set up your local development environment:
+This package uses a custom npm registry hosted on Cloudflare Workers. To set up your local development environment:
 
 1.  **Copy the environment template:**
     ```bash
     cp .env.local.example .env.local
     ```
-2.  **Fill in your credentials** in `.env.local`. You will need a valid `NPM_TOKEN`.
+2.  **Configure environment variables** in `.env.local`:
+    - `NPM_TOKEN`: Your private registry authentication token.
+    - `NPM_PACKAGE_SCOPE`: The `@babadeluxe` scope.
+    - `NPM_REGISTRY`: The hostname of the registry.
+    - `NPM_REGISTRY_URL`: The full protocol-prefixed URL of the registry.
 3.  **Install dependencies:**
     ```bash
     pnpm install
@@ -98,6 +111,8 @@ This package uses a custom npm registry. To set up your local development enviro
 | Script                  | Description                                                |
 | :---------------------- | :--------------------------------------------------------- |
 | `pnpm build`            | Produces ESM, CJS, and `.d.ts` declarations via `unbuild`  |
+| `pnpm test`             | Runs the test suite via Vitest                             |
+| `pnpm type-check`       | Performs static type checking via `tsc`                    |
 | `pnpm format`           | Lints and formats with XO + Prettier                       |
 | `pnpm generate-barrels` | Regenerates barrel exports via `barrelsby`                 |
 | `pnpm test-package`     | Builds and performs a dry-run pack to verify integrity     |
