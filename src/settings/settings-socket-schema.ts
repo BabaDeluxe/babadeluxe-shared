@@ -104,6 +104,50 @@ export const settingSchema = /* @__PURE__ */ z.object({
     .optional(),
 
   /**
+   * Per-model top_p overrides stored as a JSON object.
+   *
+   * Keys are model value strings (e.g. `"gpt-4o"`, `"claude-sonnet-4-5"`).
+   * Values are floats in the range [0, 1].
+   *
+   * Controls nucleus sampling — the model only considers tokens whose cumulative
+   * probability mass is ≤ top_p. Lower values make output more focused.
+   *
+   * Example:
+   * ```json
+   * { "gpt-4o": 0.9, "claude-sonnet-4-5": 0.7 }
+   * ```
+   *
+   * Stored as a JSON string on the wire; parsed on read.
+   * When a model key is absent the provider default is used.
+   */
+  modelTopPs: z
+    .record(z.string(), z.number().min(0).max(1))
+    .describe('Per-model top_p overrides (model value → 0–1 float)')
+    .optional(),
+
+  /**
+   * Per-model top_k overrides stored as a JSON object.
+   *
+   * Keys are model value strings (e.g. `"gemini-2.0-flash"`, `"claude-sonnet-4-5"`).
+   * Values are integers in the range [1, 500].
+   *
+   * Limits sampling to the top K most probable tokens at each step.
+   * Supported by Anthropic and Gemini; ignored for OpenAI-compatible providers.
+   *
+   * Example:
+   * ```json
+   * { "gemini-2.0-flash": 40, "claude-sonnet-4-5": 20 }
+   * ```
+   *
+   * Stored as a JSON string on the wire; parsed on read.
+   * When a model key is absent the provider default is used.
+   */
+  modelTopKs: z
+    .record(z.string(), z.number().int().min(1).max(500))
+    .describe('Per-model top_k overrides (model value → integer 1–500)')
+    .optional(),
+
+  /**
    * Reasoning effort level for models that support extended thinking.
    *
    * Supported by: OpenAI o-series, Anthropic Claude 3.7+, Gemini 2.0 Flash
@@ -329,6 +373,18 @@ export const settingMetadata: Record<
     dataType: 'json-object',
     required: false,
   },
+  modelTopPs: {
+    category: 'model',
+    encrypted: false,
+    dataType: 'json-object',
+    required: false,
+  },
+  modelTopKs: {
+    category: 'model',
+    encrypted: false,
+    dataType: 'json-object',
+    required: false,
+  },
 
   reasoningEffort: {
     category: 'inference',
@@ -360,7 +416,7 @@ export const settingMetadata: Record<
   ollamaEnabledModels: {
     category: 'ollama',
     encrypted: false,
-    dataType: 'json-array', // serialised JSON array on the wire
+    dataType: 'json-array',
     required: false,
   },
 
@@ -587,10 +643,6 @@ export const defaultTemperature = 1
 
 /**
  * Get the temperature for a specific model, falling back to the provider default.
- *
- * @example
- * const temp = getModelTemperature({ 'gpt-4o': 0.7 }, 'claude-sonnet-4-5') // 1.0
- * const temp2 = getModelTemperature({ 'gpt-4o': 0.7 }, 'gpt-4o')           // 0.7
  */
 /* @__NO_SIDE_EFFECTS__ */
 export function getModelTemperature(
@@ -621,6 +673,88 @@ export function resetModelTemperature(
   modelValue: string
 ): ModelTemperatures {
   const { [modelValue]: _, ...rest } = temperatures ?? {}
+  return rest
+}
+
+// ─── Model top_p helpers ──────────────────────────────────────────────────────
+
+/** Shape of the modelTopPs setting value. */
+export type ModelTopPs = Record<string, number>
+
+/**
+ * Get the top_p for a specific model. Returns undefined when no override exists
+ * so the provider default is used.
+ */
+/* @__NO_SIDE_EFFECTS__ */
+export function getModelTopP(
+  topPs: ModelTopPs | undefined,
+  modelValue: string
+): number | undefined {
+  return topPs?.[modelValue]
+}
+
+/**
+ * Set the top_p for a specific model, returning a new object (immutable).
+ */
+/* @__NO_SIDE_EFFECTS__ */
+export function setModelTopP(
+  topPs: ModelTopPs | undefined,
+  modelValue: string,
+  value: number
+): ModelTopPs {
+  return { ...topPs, [modelValue]: value }
+}
+
+/**
+ * Remove the top_p override for a specific model (reset to provider default).
+ */
+/* @__NO_SIDE_EFFECTS__ */
+export function resetModelTopP(
+  topPs: ModelTopPs | undefined,
+  modelValue: string
+): ModelTopPs {
+  const { [modelValue]: _, ...rest } = topPs ?? {}
+  return rest
+}
+
+// ─── Model top_k helpers ──────────────────────────────────────────────────────
+
+/** Shape of the modelTopKs setting value. */
+export type ModelTopKs = Record<string, number>
+
+/**
+ * Get the top_k for a specific model. Returns undefined when no override exists
+ * so the provider default is used.
+ */
+/* @__NO_SIDE_EFFECTS__ */
+export function getModelTopK(
+  topKs: ModelTopKs | undefined,
+  modelValue: string
+): number | undefined {
+  return topKs?.[modelValue]
+}
+
+/**
+ * Set the top_k for a specific model, returning a new object (immutable).
+ */
+/* @__NO_SIDE_EFFECTS__ */
+export function setModelTopK(
+  topKs: ModelTopKs | undefined,
+  modelValue: string,
+  value: number
+): ModelTopKs {
+  return { ...topKs, [modelValue]: value }
+}
+
+/**
+ * Remove the top_k override for a specific model (reset to provider default).
+ */
+/* @__NO_SIDE_EFFECTS__ */
+export function resetModelTopK(
+  topKs: ModelTopKs | undefined,
+  modelValue: string
+): ModelTopKs {
+  const { [modelValue]: _, ...rest } = topKs ?? {}
   return rest
 }
 
