@@ -62,24 +62,24 @@ const createMkdistEntriesFromExports = (): MkdistBuildEntry[] => {
       processedDirs.add(dirKey)
 
       // Add ESM entry
-      entries.push({
-        builder: 'mkdist',
-        input: srcDir,
-        outDir,
-        format: 'esm',
-        ext: 'mjs',
-        declaration: true,
-      })
-
-      // Add CJS entry
-      entries.push({
-        builder: 'mkdist',
-        input: srcDir,
-        outDir,
-        format: 'cjs',
-        ext: 'cjs',
-        declaration: false,
-      })
+      entries.push(
+        {
+          builder: 'mkdist',
+          input: srcDir,
+          outDir,
+          format: 'esm',
+          ext: 'mjs',
+          declaration: true,
+        },
+        {
+          builder: 'mkdist',
+          input: srcDir,
+          outDir,
+          format: 'cjs',
+          ext: 'cjs',
+          declaration: false,
+        }
+      )
     }
   }
 

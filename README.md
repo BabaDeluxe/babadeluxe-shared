@@ -30,9 +30,9 @@ In a complex distributed system like BabaDeluxe, maintaining consistency between
 | `@babadeluxe/shared/space-context`          | Vector-ready context blocks and embedding structures               |
 | `@babadeluxe/shared/tts`                    | Text-to-speech provider interfaces and options                     |
 | `@babadeluxe/shared/generated-socket-types` | Auto-generated TypeScript interfaces for Socket.io events          |
-| `@babadeluxe/shared/settings`               | User configuration schema, validation, and metadata                |
-| `@babadeluxe/shared/settings/schema`        | Low-level Zod schemas for settings validation                      |
-| `@babadeluxe/shared/utils`                  | General utilities: Damerau-Levenshtein distance, safe JSON parsing |
+| `@babadeluxe/shared/settings`               | User configuration schema, validation, and metadata                                      |
+| `@babadeluxe/shared/settings/schema`        | Low-level Zod schemas for settings validation                                            |
+| `@babadeluxe/shared/utils`                  | General utilities: DAG prompt builder, Damerau-Levenshtein, safe JSON parsing, BaseError |
 
 ## Installation
 
@@ -85,6 +85,34 @@ import { damerauLevenshteinSimilarity } from '@babadeluxe/shared/utils'
 
 const score = damerauLevenshteinSimilarity('typing', 'tpying')
 console.log(score) // 0.833... (high similarity due to transposition)
+```
+
+### DAG Prompt Builder
+
+```typescript
+import { DagPromptBuilder } from '@babadeluxe/shared/utils'
+
+const builder = new DagPromptBuilder()
+
+builder.addNode({
+  id: 'system',
+  render: () => 'You are a helpful assistant.'
+})
+
+builder.addNode({
+  id: 'context',
+  dependsOn: ['system'],
+  render: (deps) => `${deps.system}\n\nContext: { "some": "data" }`
+})
+
+builder.addNode({
+  id: 'user',
+  dependsOn: ['context'],
+  render: (deps) => `${deps.context}\n\nUser: Hello!\nAssistant:`
+})
+
+const prompt = builder.build()
+console.log(prompt)
 ```
 
 ## Contributor Setup

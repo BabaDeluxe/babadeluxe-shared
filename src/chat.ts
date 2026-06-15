@@ -1,8 +1,7 @@
 // ─── Chat message types ────────────────────────────────────────────────────────────
 //
 // NOTE: This file is hand-written. The generated `socket-types.ts` contains the
-// socket wire shapes. Add the `chat:reasoningChunk` event there via
-// `pnpm generate-socket-types` once babadeluxe-backend#32 is implemented.
+// socket wire shapes.
 //
 // Linked to: babadeluxe-shared#10, babadeluxe-backend#32
 
