@@ -78,6 +78,25 @@ if (result.isOk()) {
 }
 ```
 
+### Structured Error Handling
+
+```typescript
+import { BaseError } from '@babadeluxe/shared/utils'
+
+// BaseError automatically derives a namespace from the class name (stripping "Error")
+class DatabaseError extends BaseError {}
+
+try {
+  throw new DatabaseError('Connection failed', new Error('Original cause'))
+} catch (error) {
+  if (error instanceof BaseError) {
+    console.error(error.namespace) // "Database"
+    console.error(error.message)   // "[Database] Connection failed"
+    console.log(error.toString())  // Includes stack and causal chain
+  }
+}
+```
+
 ### Damerau-Levenshtein Similarity
 
 ```typescript
