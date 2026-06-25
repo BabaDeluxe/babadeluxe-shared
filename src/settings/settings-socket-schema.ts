@@ -709,10 +709,7 @@ export function setModelTopP(
  * Remove the top_p override for a specific model (reset to provider default).
  */
 /* @__NO_SIDE_EFFECTS__ */
-export function resetModelTopP(
-  topPs: ModelTopPs | undefined,
-  modelValue: string
-): ModelTopPs {
+export function resetModelTopP(topPs: ModelTopPs | undefined, modelValue: string): ModelTopPs {
   const { [modelValue]: _, ...rest } = topPs ?? {}
   return rest
 }
@@ -750,10 +747,7 @@ export function setModelTopK(
  * Remove the top_k override for a specific model (reset to provider default).
  */
 /* @__NO_SIDE_EFFECTS__ */
-export function resetModelTopK(
-  topKs: ModelTopKs | undefined,
-  modelValue: string
-): ModelTopKs {
+export function resetModelTopK(topKs: ModelTopKs | undefined, modelValue: string): ModelTopKs {
   const { [modelValue]: _, ...rest } = topKs ?? {}
   return rest
 }
