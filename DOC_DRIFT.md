@@ -1,6 +1,6 @@
 # Documentation Drift Report
 
-**Run Date/Time:** 2026-06-20 03:03 UTC
+**Run Date/Time:** 2026-09-12 03:29 UTC
 **Branch Analyzed:** `master` (as `dev` was not found)
 
 ## Files Reviewed
@@ -13,10 +13,11 @@
 
 ## Regressions & Gaps Found
 
-1.  **Missing BaseError Documentation:** `README.md` was missing a usage example for `BaseError`, which is a core utility for structured error handling.
-2.  **Stale Contributor Comment (src/chat.ts):** The file contains a note describing `ReasoningChunkPayload` as a "shared contract until `socket-types.ts` is regenerated." However, `socket-types.ts` already includes the `chat:reasoningChunk` event.
-3.  **Contradictory Comment (src/utils/dag-prompt-builder.ts):** A comment describes `ResolvedDeps` as a "Named interface (not `Record<string, string>`)", but it is implemented as a type alias for `Record<string, string>`.
-4.  **Schema Drift (Socket Types):** The `SettingDataType` union in `src/generated-socket-types/socket-types.ts` (used in `settings:getAll` and `settings:upsert`) only supports `"string" | "number" | "boolean"`. It is missing `"json-object"` and `"json-array"`, which are defined in `src/settings/settings-socket-schema.ts`.
+1. **DagPromptBuilder Example Parameter Naming (README.md):** `README.md` used `deps` as the parameter name in the `DagPromptBuilder` usage example, whereas the codebase type definition is `ResolvedDeps`.
+2. **Markdown Formatting Issues (README.md & DOC_DRIFT.md):** List marker spacing (MD030), missing blank lines around fenced code blocks (MD031), and emphasis style (MD049) violations were present in `README.md` and `DOC_DRIFT.md`.
+3. **Stale Contributor Comment (src/chat.ts):** The file contains a note describing `ReasoningChunkPayload` as a "shared contract until `socket-types.ts` is regenerated." However, `socket-types.ts` already includes the `chat:reasoningChunk` event.
+4. **Contradictory Comment (src/utils/dag-prompt-builder.ts):** A comment describes `ResolvedDeps` as a "Named interface (not `Record<string, string>`)", but it is implemented as a type alias for `Record<string, string>`.
+5. **Schema Drift (Socket Types):** The `SettingDataType` union in `src/generated-socket-types/socket-types.ts` (used in `settings:getAll` and `settings:upsert`) only supports `"string" | "number" | "boolean"`. It is missing `"json-object"` and `"json-array"`, which are defined in `src/settings/settings-socket-schema.ts`.
 
 ## Files Changed
 
@@ -25,5 +26,6 @@
 
 ## Fixes Applied
 
-- **README Improvements:** Added a "Structured Error Handling" section to `README.md` with a practical example of extending and using `BaseError`.
-- **Drift Reporting:** Documented stale comments and schema drift in `DOC_DRIFT.md` for future remediation (source code changes were out of scope for this pass).
+- **README Parameter Naming:** Updated `DagPromptBuilder` callback parameter from `deps` to `resolvedDeps` in `README.md` for consistency with `ResolvedDeps` type.
+- **Markdown Linting Fixes:** Fixed list marker spacing (MD030), added blank lines around fenced code blocks (MD031), and fixed emphasis style (MD049) in `README.md` and `DOC_DRIFT.md`.
+- **Drift Reporting:** Documented code-level comment drift and schema drift in `DOC_DRIFT.md` for future remediation (source code modifications are out of scope for documentation passes).
