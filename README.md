@@ -138,19 +138,23 @@ console.log(prompt)
 
 This package uses a custom npm registry hosted on Cloudflare Workers. To set up your local development environment:
 
-1.  **Copy the environment template:**
+1. **Copy the environment template:**
+
     ```bash
     cp .env.local.example .env.local
     ```
-2.  **Configure environment variables** in `.env.local`:
+
+2. **Configure environment variables** in `.env.local`:
     - `NPM_TOKEN`: Your private registry authentication token.
     - `NPM_PACKAGE_SCOPE`: The `@babadeluxe` scope.
     - `NPM_REGISTRY`: The hostname of the registry.
     - `NPM_REGISTRY_URL`: The full protocol-prefixed URL of the registry.
-3.  **Install dependencies:**
+3. **Install dependencies:**
+
     ```bash
     pnpm install
     ```
+
     The `pnpm:devPreinstall` hook will automatically run `setup-npmrc.ts` to generate your local `.npmrc` and configure `publishConfig` in `package.json`.
 
 ## Development
@@ -174,4 +178,4 @@ This project is licensed under the **European Union Public License 1.2 (EUPL-1.2
 
 ---
 
-**BabaDeluxe** — _Redefining the Future of Software Development._
+**BabaDeluxe** — *Redefining the Future of Software Development.*
